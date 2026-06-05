@@ -1,0 +1,3 @@
+[submodule "UserLib/BinaryGFX"]
+	path = UserLib/BinaryGFX
+	url = https://github.com/pic-man749/BinaryGFX.git
