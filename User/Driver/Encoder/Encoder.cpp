@@ -9,7 +9,6 @@ namespace Driver {
 
   Encoder::Encoder(TIM_HandleTypeDef *htim){
     htim_ = htim;
-    lastCounterValue_ = __HAL_TIM_GET_COUNTER(htim_);
   }
 
   bool Encoder::Start(void){
@@ -21,14 +20,11 @@ namespace Driver {
   }
 
   int Encoder::GetValue(void){
-    const int nowCounterValue = __HAL_TIM_GET_COUNTER(htim_);
-    const int delta = nowCounterValue - lastCounterValue_;
-    lastCounterValue_ = nowCounterValue;
-    return delta / 2;
+    return __HAL_TIM_GET_COUNTER(htim_) / 2;
   }
 
   void Encoder::SetValue(int value){
-    __HAL_TIM_SET_COUNTER(htim_, (uint32_t)(value * 2));
+    __HAL_TIM_SET_COUNTER(htim_, static_cast<uint32_t>(value * 2));
   }
 
 }
