@@ -20,6 +20,11 @@ namespace Driver {
 
       bool Stop(void);
 
+      /**
+       * @brief エンコーダカウンタ値を取得する
+       *
+       * @return カウンタ値（内部カウンタ値 / 2）
+       */
       int GetValue(void);
 
       /**
@@ -32,8 +37,6 @@ namespace Driver {
     private:
 
       TIM_HandleTypeDef *htim_;
-
-      int32_t lastCounterValue_;
 
   };
 }
