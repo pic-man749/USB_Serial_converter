@@ -71,6 +71,11 @@ namespace Driver {
        */
       uint32_t getReceiveData(uint8_t *data, uint32_t size);
 
+      /**
+       * @brief 受信バッファをクリアする
+       */
+      void clearReceiveBuffer();
+
     private:
       UART_HandleTypeDef *huart_;
       std::vector<uint8_t> receiveBuffer_;

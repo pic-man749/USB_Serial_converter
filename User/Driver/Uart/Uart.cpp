@@ -38,6 +38,12 @@ namespace Driver {
     readPos_ = 0;
   }
 
+  void Uart::clearReceiveBuffer() {
+    // 読み出し位置を現在の書き込み位置に揃えて破棄する
+    const uint32_t bufSize = static_cast<uint32_t>(receiveBuffer_.size());
+    readPos_ = bufSize - __HAL_DMA_GET_COUNTER(huart_->hdmarx);
+  }
+
   uint32_t Uart::getReceiveDataSize() {
     // DMAカウンタは残り転送数を示すため、バッファサイズから引いて書き込み位置を算出する
     const uint32_t bufSize = static_cast<uint32_t>(receiveBuffer_.size());
