@@ -20,7 +20,9 @@ namespace Driver {
   }
 
   int Encoder::GetValue(void){
-    return __HAL_TIM_GET_COUNTER(htim_) / 2;
+    // uint32_t のまま除算すると、カウンタが 0 を跨いで折り返したときバグるので
+    // int32_t にキャストしてから除算することで折り返しを符号付きで扱う。
+    return static_cast<int32_t>(__HAL_TIM_GET_COUNTER(htim_)) / 2;
   }
 
   void Encoder::SetValue(int value){
