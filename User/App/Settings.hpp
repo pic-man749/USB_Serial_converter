@@ -23,7 +23,7 @@ enum class DisplayFormat : uint8_t {
 
 constexpr uint32_t BAUD_RATES[]     = { 9600, 38400, 115200, 921600, 3000000 };
 constexpr uint8_t  BAUD_RATE_COUNT  = 5;
-constexpr uint8_t  DEFAULT_BAUD_IDX = 3;  // 115200 bps
+constexpr uint8_t  DEFAULT_BAUD_IDX = 2;  // 115200 bps
 
 struct Settings {
     UartChannel   channel     = UartChannel::UART1;
