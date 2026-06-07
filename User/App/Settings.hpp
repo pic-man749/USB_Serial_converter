@@ -13,7 +13,7 @@ namespace App {
 enum class UartChannel : uint8_t {
     UART1 = 0,
     UART2 = 1,
-    UART6 = 2,
+    UART3 = 2,
 };
 
 enum class DisplayFormat : uint8_t {
@@ -21,9 +21,9 @@ enum class DisplayFormat : uint8_t {
     HEX   = 1,
 };
 
-constexpr uint32_t BAUD_RATES[]     = { 9600, 19200, 38400, 57600, 115200, 230400 };
-constexpr uint8_t  BAUD_RATE_COUNT  = 6;
-constexpr uint8_t  DEFAULT_BAUD_IDX = 4;  // 115200 bps
+constexpr uint32_t BAUD_RATES[]     = { 9600, 38400, 115200, 921600, 3000000 };
+constexpr uint8_t  BAUD_RATE_COUNT  = 5;
+constexpr uint8_t  DEFAULT_BAUD_IDX = 3;  // 115200 bps
 
 struct Settings {
     UartChannel   channel     = UartChannel::UART1;

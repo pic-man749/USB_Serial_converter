@@ -9,7 +9,7 @@
 namespace App {
 
 // チャンネル名テーブル
-static constexpr const char* CHANNEL_NAMES[] = { "USART1", "USART2", "USART6" };
+static constexpr const char* CHANNEL_NAMES[] = { "USART1", "USART2", "USART3" };
 
 // MAIN メニューの項目名テーブル
 static constexpr const char* MAIN_LABELS[] = { "UART", "Baud", "Fmt " };
@@ -277,7 +277,7 @@ uint8_t SettingsMenu::channelToIndex(UartChannel ch) {
     switch (ch) {
         case UartChannel::UART1: return 0;
         case UartChannel::UART2: return 1;
-        case UartChannel::UART6: return 2;
+        case UartChannel::UART3: return 2;
         default:                  return 0;
     }
 }
@@ -286,7 +286,7 @@ UartChannel SettingsMenu::indexToChannel(uint8_t idx) {
     switch (idx) {
         case 0: return UartChannel::UART1;
         case 1: return UartChannel::UART2;
-        case 2: return UartChannel::UART6;
+        case 2: return UartChannel::UART3;
         default: return UartChannel::UART1;
     }
 }
