@@ -14,7 +14,7 @@ namespace Driver {
   class Encoder {
 
     public:
-      Encoder(TIM_HandleTypeDef *htim);
+      Encoder();
 
       bool Start(void);
 
