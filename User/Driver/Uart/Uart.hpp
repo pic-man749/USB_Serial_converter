@@ -47,6 +47,14 @@ namespace Driver {
       static void TxCpltCallback(UART_HandleTypeDef *huart);
 
       /**
+       * @brief UARTエラーコールバック（静的ディスパッチ）
+       * @details Callback_wrapper の Uart_ErrorCallback から呼び出す
+       * @details フレーミングエラー等の受信エラー発生時にDMA受信を自動復帰する
+       * @param huart エラーが発生した UART ハンドル
+       */
+      static void ErrorCallback(UART_HandleTypeDef *huart);
+
+      /**
        * @brief データを送信する（前回送信完了まで待機後、割込みで非同期送信）
        * @details 内部バッファにコピーしてから HAL_UART_Transmit_IT を呼び出す
        * @param data 送信データへのポインタ
@@ -89,6 +97,7 @@ namespace Driver {
       UART_HandleTypeDef *huart_;
       std::vector<uint8_t> receiveBuffer_;
       uint32_t readPos_;
+      bool isReceiving_;
       bool isSending_;
       std::unique_ptr<uint8_t[]> sendBuffer_;
       uint16_t sendBufferSize_;

@@ -6,6 +6,14 @@
 #include "Callback_wrapper.hpp"
 #include "Uart.hpp"
 
-void Uart_TxCpltCallback(UART_HandleTypeDef *huart) {
-  Driver::Uart::TxCpltCallback(huart);
+extern "C" {
+
+  void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+    Driver::Uart::TxCpltCallback(huart);
+  }
+
+  void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
+    Driver::Uart::ErrorCallback(huart);
+  }
+
 }
