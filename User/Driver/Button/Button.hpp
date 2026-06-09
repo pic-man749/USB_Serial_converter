@@ -8,7 +8,7 @@
 #define DRIVER_BUTTON_BUTTON_HPP_
 
 #include <cstdint>
-#include "ButtonType.hpp"
+#include "ButtonState.hpp"
 
 namespace Driver {
 
@@ -17,9 +17,7 @@ namespace Driver {
     public:
       Button();
 
-      ButtonType GetPushedButton();
-
-      ButtonType GetPushedButton(int32_t timeout);
+      ButtonState GetButtonState();
 
     private:
 
