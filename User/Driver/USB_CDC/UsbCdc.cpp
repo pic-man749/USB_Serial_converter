@@ -7,6 +7,10 @@
 #include "UsbCdc.hpp"
 #include "usbd_cdc_if.h"
 
+extern "C" {
+  extern USBD_HandleTypeDef hUsbDeviceFS;
+}
+
 namespace Driver {
 
   Common::Queue UsbCdc::receiveQueue_(RECEIVE_QUEUE_SIZE);
@@ -27,10 +31,22 @@ namespace Driver {
     isSending_ = false;
   }
 
+  bool UsbCdc::isConnected() {
+    return hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED;
+  }
+
   void UsbCdc::send(uint8_t *data, uint16_t size) {
-    // 前回データを送信中なら完了まで待つ
-    while (isSending_) {
+    // 未接続時は送信しない
+    if (!isConnected()) {
+      return;
+    }
+    // 前回データを送信中の場合は、完了または切断まで待つ
+    while (isSending_ && isConnected()) {
       ;
+    }
+    if (!isConnected()) {
+      isSending_ = false;
+      return;
     }
     isSending_ = true;
     // すでに確保済みの送信バッファサイズが要求サイズよりも小さかった場合のみ再確保する
@@ -41,7 +57,10 @@ namespace Driver {
     for (uint16_t idx = 0; idx < size; ++idx) {
       sendBuffer_[idx] = data[idx];
     }
-    CDC_Transmit_FS(sendBuffer_.get(), size);
+    // 送信要求が失敗した場合はフラグをリセットする
+    if (CDC_Transmit_FS(sendBuffer_.get(), size) != USBD_OK) {
+      isSending_ = false;
+    }
   }
 
   uint32_t UsbCdc::getReceiveDataSize() const {
