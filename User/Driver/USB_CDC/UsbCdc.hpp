@@ -44,7 +44,14 @@ namespace Driver {
       static void SendCpltCallback();
 
       /**
+       * @brief PC（USB ホスト）と接続中かどうかを返す
+       * @return 接続中なら true
+       */
+      static bool isConnected();
+
+      /**
        * @brief データを送信する（ブロッキング）
+       * @details USB未接続時は何もしない
        * @param data 送信データへのポインタ
        * @param size 送信バイト数
        */
