@@ -13,7 +13,8 @@
 extern "C" {
 #endif
 
-void Uart_TxCpltCallback(UART_HandleTypeDef *huart);
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);
 
 #ifdef __cplusplus
 }
