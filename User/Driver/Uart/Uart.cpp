@@ -8,8 +8,15 @@
 
 namespace Driver {
 
+  Uart *Uart::instanceRegistry_[INSTANCE_REGISTRY_SIZE] = {};
+  uint8_t Uart::instanceCount_ = 0;
+
   Uart::Uart(UART_HandleTypeDef *huart, const uint32_t queueSize) :
-      huart_(huart), receiveBuffer_(queueSize, 0), readPos_(0) {
+      huart_(huart), receiveBuffer_(queueSize, 0), readPos_(0),
+      isSending_(false), sendBuffer_(nullptr), sendBufferSize_(0) {
+    if (instanceCount_ < INSTANCE_REGISTRY_SIZE) {
+      instanceRegistry_[instanceCount_++] = this;
+    }
   }
 
   Uart::~Uart() {
@@ -17,14 +24,41 @@ namespace Driver {
   }
 
   bool Uart::setbaudrate(uint32_t baudrate) {
+    // 再初期化前に進行中の送信を中断する
+    HAL_UART_AbortTransmit(huart_);
+    isSending_ = false;
     HAL_UART_DeInit(huart_);
     huart_->Init.BaudRate = baudrate;
     return HAL_UART_Init(huart_) == HAL_OK;
   }
 
+  void Uart::TxCpltCallback(UART_HandleTypeDef *huart) {
+    for (uint8_t i = 0; i < instanceCount_; ++i) {
+      if (instanceRegistry_[i]->huart_ == huart) {
+        instanceRegistry_[i]->isSending_ = false;
+        break;
+      }
+    }
+  }
+
   void Uart::send(const char *data, uint32_t size) {
-    HAL_UART_Transmit(huart_, reinterpret_cast<const uint8_t*>(data), static_cast<uint16_t>(size),
-        HAL_MAX_DELAY);
+    // 前回送信が完了するまで待つ
+    while (isSending_) {
+      ;
+    }
+    isSending_ = true;
+    // すでに確保済みの送信バッファサイズが要求サイズよりも小さかった場合のみ再確保する
+    if (sendBuffer_ == nullptr || sendBufferSize_ < size) {
+      sendBuffer_ = std::make_unique<uint8_t[]>(size);
+      sendBufferSize_ = static_cast<uint16_t>(size);
+    }
+    for (uint32_t idx = 0; idx < size; ++idx) {
+      sendBuffer_[idx] = static_cast<uint8_t>(data[idx]);
+    }
+    // 送信要求が失敗した場合はフラグをリセットする
+    if (HAL_UART_Transmit_IT(huart_, sendBuffer_.get(), static_cast<uint16_t>(size)) != HAL_OK) {
+      isSending_ = false;
+    }
   }
 
   void Uart::startReceive() {
