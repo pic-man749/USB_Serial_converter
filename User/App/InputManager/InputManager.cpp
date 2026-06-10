@@ -52,13 +52,13 @@ namespace App {
     }
   }
 
-  bool InputManager::PopEvent(InputEvent &event) {
+  InputEvent InputManager::PopEvent() {
     if(queue_head_ == queue_tail_) {
-      return false;
+      return NoneEvent {};
     }
-    event = event_queue_[queue_head_];
+    InputEvent event = event_queue_[queue_head_];
     queue_head_ = (queue_head_ + 1) % kEventQueueSize;
-    return true;
+    return event;
   }
 
   void InputManager::PushEvent(InputEvent event) {

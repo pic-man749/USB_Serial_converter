@@ -17,6 +17,9 @@
 
 namespace App {
 
+  /** イベントなし */
+  struct NoneEvent {};
+
   /** ボタン単押しイベント */
   struct ButtonPressEvent {
       Driver::ButtonType button_id;
@@ -41,7 +44,7 @@ namespace App {
   };
 
   /** 統一入力イベント型 */
-  using InputEvent = std::variant<ButtonPressEvent, ButtonLongPressEvent, ButtonReleaseEvent, EncoderRotateEvent>;
+  using InputEvent = std::variant<NoneEvent, ButtonPressEvent, ButtonLongPressEvent, ButtonReleaseEvent, EncoderRotateEvent>;
 
   /**
    * @brief 入力イベントを管理するクラス
@@ -67,10 +70,9 @@ namespace App {
 
       /**
        * @brief イベントキューから1件取得する
-       * @param[out] event 取得したイベントの格納先
-       * @return イベントがあれば true、キューが空なら false
+       * @return 取得したイベント。キューが空の場合は NoneEvent を返す
        */
-      bool PopEvent(InputEvent &event);
+      InputEvent PopEvent();
 
     private:
       Driver::Button button_;
