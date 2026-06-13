@@ -7,6 +7,7 @@
 #ifndef APP_INPUTMANAGER_INPUTEVENT_HPP_
 #define APP_INPUTMANAGER_INPUTEVENT_HPP_
 
+#include <variant>
 #include "../../Driver/Button/ButtonState.hpp"
 #include "../../Driver/Button/ButtonType.hpp"
 
@@ -14,19 +15,16 @@ namespace App {
   /** イベントなし */
   struct NoneEvent {};
 
-  /** ボタン単押しイベント */
-  struct ButtonPressEvent {
-      Driver::ButtonType button_id;
+  enum class ButtonEventType {
+    kPress,
+    kRelease,
+    kLongPress
   };
 
-  /** ボタン長押しイベント */
-  struct ButtonLongPressEvent {
+  /** ボタンイベント */
+  struct ButtonEvent {
       Driver::ButtonType button_id;
-  };
-
-  /** ボタンReleaseイベント */
-  struct ButtonReleaseEvent {
-      Driver::ButtonType button_id;
+      ButtonEventType type;
   };
 
   /**
@@ -37,8 +35,8 @@ namespace App {
       int32_t delta;
   };
 
-  /** 統一入力イベント型 */
-  using InputEvent = std::variant<NoneEvent, ButtonPressEvent, ButtonLongPressEvent, ButtonReleaseEvent, EncoderRotateEvent>;
+  /** 入力イベント型 */
+  using InputEvent = std::variant<NoneEvent, ButtonEvent, EncoderRotateEvent>;
 }
 
 #endif /* APP_INPUTMANAGER_INPUTEVENT_HPP_ */

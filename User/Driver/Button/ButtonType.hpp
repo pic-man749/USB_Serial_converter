@@ -7,6 +7,8 @@
 #ifndef DRIVER_BUTTON_BUTTONTYPE_HPP_
 #define DRIVER_BUTTON_BUTTONTYPE_HPP_
 
+#include <cstdint>
+
 namespace Driver {
 
   /**

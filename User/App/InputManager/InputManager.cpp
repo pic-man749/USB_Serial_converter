@@ -29,15 +29,15 @@ namespace App {
       if(curr_pressed && !is_pressed_[i]) {
         // 押下開始を記録し、押下イベント発行
         press_start_ms_[i] = now;
-        PushEvent(ButtonPressEvent { id });
+        PushEvent(ButtonEvent { id, ButtonEventType::kPress });
       } else if(!curr_pressed && is_pressed_[i]) {
         // リリースイベントを発行
-        PushEvent(ButtonReleaseEvent { id });
+        PushEvent(ButtonEvent { id, ButtonEventType::kRelease });
       } else if(curr_pressed && !is_long_pressed_[i]
           && (now - press_start_ms_[i] >= kLongPressThresholdMs)) {
         // 長押しイベントを発行
         is_long_pressed_[i] = true;
-        PushEvent(ButtonLongPressEvent { id });
+        PushEvent(ButtonEvent { id, ButtonEventType::kLongPress });
       }
 
       is_pressed_[i] = curr_pressed;
