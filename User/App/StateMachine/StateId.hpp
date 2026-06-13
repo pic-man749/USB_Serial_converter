@@ -14,6 +14,7 @@ namespace App {
     Setting,
     SettingUart,
     SettingBaudRate,
+    SettingBaudRateCustom,
     SettingFormat,
     Count
   };

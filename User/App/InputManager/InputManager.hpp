@@ -10,7 +10,7 @@
 #include <array>
 #include <cstdint>
 #include <variant>
-#include "InputEvent.hpp"
+#include "../Event.hpp"
 #include "../../Driver/Button/Button.hpp"
 #include "../../Driver/Encoder/Encoder.hpp"
 
@@ -42,7 +42,7 @@ namespace App {
        * @brief イベントキューから1件取得する
        * @return 取得したイベント。キューが空の場合は NoneEvent を返す
        */
-      InputEvent PopEvent();
+      Event PopEvent();
 
     private:
       Driver::Button button_;
@@ -52,7 +52,7 @@ namespace App {
       std::array<bool, static_cast<std::size_t>(Driver::ButtonType::kCount)> is_long_pressed_;
       std::array<uint32_t, static_cast<std::size_t>(Driver::ButtonType::kCount)> press_start_ms_;
 
-      std::array<InputEvent, kEventQueueSize> event_queue_;
+      std::array<Event, kEventQueueSize> event_queue_;
       std::size_t queue_head_;
       std::size_t queue_tail_;
 
@@ -61,7 +61,7 @@ namespace App {
       /**
        * @brief イベントキューにイベントを追加する。満杯の場合は最古イベントを破棄する。
        */
-      void PushEvent(InputEvent event);
+      void PushEvent(Event event);
 
       /**
        * @brief ButtonStateから指定ボタンの押下状態を返す

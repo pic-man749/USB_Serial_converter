@@ -12,7 +12,7 @@ namespace App {
     GetCurrentState()->Enter();
   }
 
-  void StateMachine::Execute(const InputEvent &event, const RenderContext &renderContext) {
+  void StateMachine::Execute(const Event &event, const RenderContext &renderContext) {
 
     const ProcessResult result = GetCurrentState()->ProcessEvent(event);
 

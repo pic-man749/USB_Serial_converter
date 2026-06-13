@@ -52,16 +52,16 @@ namespace App {
     }
   }
 
-  InputEvent InputManager::PopEvent() {
+  Event InputManager::PopEvent() {
     if(queue_head_ == queue_tail_) {
       return NoneEvent {};
     }
-    InputEvent event = event_queue_[queue_head_];
+    Event event = event_queue_[queue_head_];
     queue_head_ = (queue_head_ + 1) % kEventQueueSize;
     return event;
   }
 
-  void InputManager::PushEvent(InputEvent event) {
+  void InputManager::PushEvent(Event event) {
     std::size_t next_tail = (queue_tail_ + 1) % kEventQueueSize;
     if(next_tail == queue_head_) {
       // キューが満杯なら最も古いイベントを破棄して空きを確保
