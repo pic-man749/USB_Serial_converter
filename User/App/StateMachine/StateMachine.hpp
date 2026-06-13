@@ -19,7 +19,7 @@ namespace App {
 
       StateMachine(StateArray stateArray, StateId initialStateId);
 
-      void Execute(const InputEvent &event, const RenderContext &renderContext);
+      void Execute(const Event &event, const RenderContext &renderContext);
 
     private:
       std::array<IState*, static_cast<size_t>(StateId::Count)> stateArray_;

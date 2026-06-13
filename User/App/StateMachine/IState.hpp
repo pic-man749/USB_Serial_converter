@@ -9,7 +9,7 @@
 #include <array>
 #include <optional>
 #include "StateId.hpp"
-#include "../InputManager/InputEvent.hpp"
+#include "../Event.hpp"
 #include "RenderContext.hpp"
 
 namespace App {
@@ -52,7 +52,7 @@ namespace App {
 
       virtual void Enter() = 0;
       virtual void Exit() = 0;
-      virtual ProcessResult ProcessEvent(const InputEvent &event) = 0;
+      virtual ProcessResult ProcessEvent(const Event &event) = 0;
       virtual void Render(const RenderContext &context) = 0;
 
     private:
