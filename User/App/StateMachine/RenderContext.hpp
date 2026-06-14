@@ -12,8 +12,8 @@
 namespace App {
 
   struct RenderContext {
-    std::unique_ptr<BinaryGFX::BinaryGFX>& RightOled;
-    std::unique_ptr<BinaryGFX::BinaryGFX>& LeftOled;
+      std::unique_ptr<BinaryGFX::BinaryGFX> &RightOled;
+      std::unique_ptr<BinaryGFX::BinaryGFX> &LeftOled;
   };
 
 }

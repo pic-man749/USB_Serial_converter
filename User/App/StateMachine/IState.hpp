@@ -9,39 +9,40 @@
 #include <array>
 #include <optional>
 #include "StateId.hpp"
-#include "../Event.hpp"
+#include "UpdateContext.hpp"
+#include "../Event/Event.hpp"
 #include "RenderContext.hpp"
 
 namespace App {
 
   struct Transition {
-    std::optional<StateId> nextState = std::nullopt;
+      std::optional<StateId> nextState = std::nullopt;
 
-    static const Transition None(){
-      return { std::nullopt };
-    }
+      static const Transition None() {
+        return {std::nullopt};
+      }
 
-    static const Transition To(StateId sid){
-      return { sid };
-    }
+      static const Transition To(StateId sid) {
+        return {sid};
+      }
   };
 
   struct ProcessResult {
-    
-    Transition transition = Transition::None();
-    bool renderRequested = false;
 
-    static const ProcessResult None() {
-      return { Transition::None(), false };
-    }
+      Transition transition = Transition::None();
+      bool renderRequested = false;
 
-    static const ProcessResult executed(bool renderRequested = false) {
-      return { Transition::None(), renderRequested };
-    }
+      static const ProcessResult None() {
+        return {Transition::None(), false};
+      }
 
-    static const ProcessResult transitionTo(StateId sid, bool renderRequested = false) {
-      return { Transition::To(sid), renderRequested };
-    }
+      static const ProcessResult executed(bool renderRequested = false) {
+        return {Transition::None(), renderRequested};
+      }
+
+      static const ProcessResult transitionTo(StateId sid, bool renderRequested = false) {
+        return {Transition::To(sid), renderRequested};
+      }
   };
 
   class IState {
@@ -50,8 +51,11 @@ namespace App {
       IState() = default;
       virtual ~IState() = default;
 
-      virtual void Enter() = 0;
+      virtual void Enter(const UpdateContext &context) = 0;
       virtual void Exit() = 0;
+      virtual ProcessResult Update(const UpdateContext&) {
+        return ProcessResult::None();
+      }
       virtual ProcessResult ProcessEvent(const Event &event) = 0;
       virtual void Render(const RenderContext &context) = 0;
 
