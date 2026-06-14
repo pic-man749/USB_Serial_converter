@@ -16,6 +16,11 @@ namespace Driver {
     public:
       Encoder();
 
+      /**
+       * @brief エンコーダタイマーを開始する。HAL 初期化後に呼び出すこと。
+       */
+      void init(void);
+
       bool Start(void);
 
       bool Stop(void);
