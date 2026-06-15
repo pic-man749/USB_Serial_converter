@@ -48,10 +48,21 @@ namespace App {
       void renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf, const char *header) const;
       /** @brief HEX 形式の1行文字列を生成する */
       static void buildHexLine(char *out, const DisplayBuffer &buf, size_t byteIndex);
-      /** @brief ASCII 形式の1行文字列を生成する */
+      /**
+       * @brief ASCII 形式の1行文字列を生成する。LF/CR で行終端とする。
+       */
       static void buildAsciiLine(char *out, const DisplayBuffer &buf, size_t byteIndex);
       /** @brief 4ビット値を HEX 文字に変換する */
       static char nibbleToHex(uint8_t n);
+      /**
+       * @brief ASCII モードでの総行数を返す。
+       *        LF で改行、kCharsPerAsciiRow 文字で折り返しとして計算する。
+       */
+      static size_t countAsciiRows(const DisplayBuffer &buf);
+      /**
+       * @brief ASCII モードで rowIndex 行目の開始バイトインデックスを返す。
+       */
+      static size_t getAsciiRowStart(const DisplayBuffer &buf, size_t rowIndex);
   };
 
 } // namespace App
