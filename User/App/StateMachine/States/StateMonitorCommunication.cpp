@@ -42,7 +42,7 @@ namespace App {
           scrollOffset_ = std::max(static_cast<int32_t>(0), scrollOffset_ + e.delta);
           return ExecuteResult::executed(true);
         },
-        [](const ButtonEvent &e) -> ExecuteResult {
+        [this](const ButtonEvent &e) -> ExecuteResult {
           if(e.button_id == Driver::ButtonType::Center && e.type == ButtonEventType::kPress) {
             return ExecuteResult::transitionTo(StateId::Setting);
           } else if(e.button_id == Driver::ButtonType::Left && e.type == ButtonEventType::kLongPress) {
