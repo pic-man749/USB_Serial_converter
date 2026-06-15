@@ -22,10 +22,9 @@
 // ドライバ層
 #include "Driver/Uart/Uart.hpp"
 #include "Driver/USB_CDC/UsbCdc.hpp"
+#include "Driver/Time/Time.hpp"
 // BinaryGFX
 #include "BinaryGFX.hpp"
-// ドライバ共通
-#include "Driver/Time/Time.hpp"
 // STM32 HAL ハンドル
 #include "usart.h"
 #include "i2c.h"
@@ -93,6 +92,12 @@ namespace {
 
 // ----------------------------------------------------------------------------
 void setup(void) {
+  // OLED起動待ち(100ms)
+  uint32_t startTick = Driver::GetTick();
+  while(Driver::GetTick() - startTick < 100) {
+    ;
+  }
+
   // 1. UART ドライバを生成する
   g_uart1 = std::make_unique<Driver::Uart>(&huart1, kUartBufSize);
   g_uart2 = std::make_unique<Driver::Uart>(&huart2, kUartBufSize);
@@ -124,7 +129,8 @@ void setup(void) {
 
   // 5. EventBus を生成し、入力とCommunicationManagerをソースとして登録する
   //    登録順がイベントのキュー投入順（= 優先度）になる
-  g_eventBus = std::make_unique<App::EventBus>(std::initializer_list<App::IEventSource*> { g_inputManager.get(), g_commMgr.get() });
+  g_eventBus = std::make_unique<App::EventBus>(std::initializer_list<App::IEventSource*> { g_inputManager.get(),
+      g_commMgr.get() });
 
   // 6. StateMachine を生成して初期ステートの Enter()/Render() を実行する
   //    buildStateArray() でステートの生成と StateMachine への所有権移譲を行う
