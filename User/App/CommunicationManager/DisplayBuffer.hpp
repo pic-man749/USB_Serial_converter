@@ -56,7 +56,7 @@ namespace App {
       std::array<uint8_t, kCapacity> buffer_;
       size_t head_;
       size_t count_;
-      bool   newDataFlag_;
+      bool newDataFlag_;
   };
 
 } // namespace App

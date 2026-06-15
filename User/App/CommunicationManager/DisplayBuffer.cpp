@@ -9,7 +9,7 @@
 namespace App {
 
   DisplayBuffer::DisplayBuffer() :
-      buffer_ {}, head_(0U), count_(0U), newDataFlag_(false) {
+      buffer_ { }, head_(0U), count_(0U), newDataFlag_(false) {
   }
 
   void DisplayBuffer::push(const uint8_t *data, size_t size) {
@@ -44,8 +44,8 @@ namespace App {
   }
 
   void DisplayBuffer::clear() {
-    head_        = 0U;
-    count_       = 0U;
+    head_ = 0U;
+    count_ = 0U;
     newDataFlag_ = false;
   }
 

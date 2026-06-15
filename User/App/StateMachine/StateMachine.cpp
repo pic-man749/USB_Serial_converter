@@ -7,22 +7,36 @@
 
 namespace App {
 
-  StateMachine::StateMachine(StateArray stateArray, StateId initialStateId) :
-      stateArray_(stateArray), currentStateId_(initialStateId) {
+  StateMachine::StateMachine(StateArray stateArray,
+                             StateId initialStateId) :
+      stateArray_(std::move(stateArray)), currentStateId_(initialStateId) {
     GetCurrentState()->Enter();
   }
 
-  void StateMachine::Execute(const Event &event, const RenderContext &renderContext) {
+  bool StateMachine::ExecuteUpdate(const UpdateContext &updateCtx) {
 
-    const ProcessResult result = GetCurrentState()->ProcessEvent(event);
+    auto ret = GetCurrentState()->Update(updateCtx);
 
-    if(result.transition.nextState.has_value()) {
-      TransitionToState(result.transition.nextState.value());
+    if(ret.transition.nextState.has_value()) {
+      TransitionToState(ret.transition.nextState.value());
+      return true;
     }
+    return ret.renderRequested;
+  }
 
-    if(result.renderRequested) {
-      GetCurrentState()->Render(renderContext);
+  bool StateMachine::ExecuteEvent(const Event &event) {
+
+    auto ret = GetCurrentState()->HandleEvent(event);
+
+    if(ret.transition.nextState.has_value()) {
+      TransitionToState(ret.transition.nextState.value());
+      return true;
     }
+    return ret.renderRequested;
+  }
+
+  void StateMachine::ExecuteRender(const RenderContext &renderContext) {
+    GetCurrentState()->Render(renderContext);
   }
 
   void StateMachine::TransitionToState(StateId newState) {
@@ -32,7 +46,7 @@ namespace App {
   }
 
   IState* StateMachine::GetCurrentState() const {
-    return stateArray_[static_cast<size_t>(currentStateId_)];
+    return stateArray_[static_cast<size_t>(currentStateId_)].get();
   }
 
 }
