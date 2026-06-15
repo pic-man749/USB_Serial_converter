@@ -19,7 +19,7 @@ namespace App {
 
   }
 
-  void StateSettingBaudRate::Enter(const UpdateContext&) {
+  void StateSettingBaudRate::Enter() {
     // 現在のボーレートがプリセットに一致すればその位置、なければ Custom... を初期カーソルにする
     cursorIndex_ = kCustomIndex;
     for(uint8_t i = 0U; i < kPresetCount; ++i) {
@@ -33,37 +33,37 @@ namespace App {
   void StateSettingBaudRate::Exit() {
   }
 
-  ProcessResult StateSettingBaudRate::ProcessEvent(const Event &event) {
+  ExecuteResult StateSettingBaudRate::HandleEvent(const Event &event) {
     return std::visit(Common::overload {
-        [](const NoneEvent&) -> ProcessResult {
-          return ProcessResult::None();
+        [](const NoneEvent&) -> ExecuteResult {
+          return ExecuteResult::None();
         },
-        [this](const EncoderRotateEvent &e) -> ProcessResult {
+        [this](const EncoderRotateEvent &e) -> ExecuteResult {
           const int32_t next = static_cast<int32_t>(cursorIndex_) + e.delta;
           cursorIndex_ = static_cast<uint8_t>(std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-          return ProcessResult::executed(true);
+          return ExecuteResult::executed(true);
         },
-        [this](const ButtonEvent& e) -> ProcessResult {
+        [this](const ButtonEvent& e) -> ExecuteResult {
           if(e.type != ButtonEventType::kPress) {
-            return ProcessResult::None();
+            return ExecuteResult::None();
           }
           if(e.button_id == Driver::ButtonType::Center) {
             if(cursorIndex_ == kCustomIndex) {
               // 任意値入力へ遷移する
-              return ProcessResult::transitionTo(StateId::SettingBaudRateCustom);
+              return ExecuteResult::transitionTo(StateId::SettingBaudRateCustom);
             }
             // プリセット確定
             config_.baudRate = kPresets[cursorIndex_];
             applicable_.setBaudRate(config_.baudRate);
-            return ProcessResult::transitionTo(StateId::Setting);
+            return ExecuteResult::transitionTo(StateId::Setting);
           }
           if(e.button_id == Driver::ButtonType::Left) {
-            return ProcessResult::transitionTo(StateId::Setting);
+            return ExecuteResult::transitionTo(StateId::Setting);
           }
-          return ProcessResult::None();
+          return ExecuteResult::None();
         },
-        [](const auto&) -> ProcessResult {
-          return ProcessResult::None();
+        [](const auto&) -> ExecuteResult {
+          return ExecuteResult::None();
         }
       }, event);
     }

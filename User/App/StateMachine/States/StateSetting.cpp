@@ -18,43 +18,43 @@ namespace App {
 
   }
 
-  void StateSetting::Enter(const UpdateContext&) {
+  void StateSetting::Enter() {
     cursorIndex_ = 0U;
   }
 
   void StateSetting::Exit() {
   }
 
-  ProcessResult StateSetting::ProcessEvent(const Event& event) {
+  ExecuteResult StateSetting::HandleEvent(const Event& event) {
     return std::visit(Common::overload {
-      [](const NoneEvent&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const NoneEvent&) -> ExecuteResult {
+        return ExecuteResult::None();
       },
-      [this](const EncoderRotateEvent& e) -> ProcessResult {
+      [this](const EncoderRotateEvent& e) -> ExecuteResult {
         const int32_t next = static_cast<int32_t>(cursorIndex_) + e.delta;
         cursorIndex_ = static_cast<uint8_t>(
             std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-        return ProcessResult::executed(true);
+        return ExecuteResult::executed(true);
       },
-      [this](const ButtonEvent& e) -> ProcessResult {
+      [this](const ButtonEvent& e) -> ExecuteResult {
         if(e.type != ButtonEventType::kPress) {
-          return ProcessResult::None();
+          return ExecuteResult::None();
         }
         if(e.button_id == Driver::ButtonType::Center) {
           switch(cursorIndex_) {
-            case 0U: return ProcessResult::transitionTo(StateId::SettingUart);
-            case 1U: return ProcessResult::transitionTo(StateId::SettingBaudRate);
-            case 2U: return ProcessResult::transitionTo(StateId::SettingFormat);
+            case 0U: return ExecuteResult::transitionTo(StateId::SettingUart);
+            case 1U: return ExecuteResult::transitionTo(StateId::SettingBaudRate);
+            case 2U: return ExecuteResult::transitionTo(StateId::SettingFormat);
             default: break;
           }
         }
         if(e.button_id == Driver::ButtonType::Left) {
-          return ProcessResult::transitionTo(StateId::MonitorCommunication);
+          return ExecuteResult::transitionTo(StateId::MonitorCommunication);
         }
-        return ProcessResult::None();
+        return ExecuteResult::None();
       },
-      [](const auto&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const auto&) -> ExecuteResult {
+        return ExecuteResult::None();
       }
     }, event);
   }

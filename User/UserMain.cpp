@@ -90,6 +90,7 @@ namespace {
     return arr;
   }
 } // namespace
+
 // ----------------------------------------------------------------------------
 void setup(void) {
   // 1. UART ドライバを生成する
@@ -123,23 +124,28 @@ void setup(void) {
 
   // 5. EventBus を生成し、入力とCommunicationManagerをソースとして登録する
   //    登録順がイベントのキュー投入順（= 優先度）になる
-  g_eventBus = std::make_unique<App::EventBus>(
-      std::initializer_list<App::IEventSource*> { g_inputManager.get(), g_commMgr.get() });
+  g_eventBus = std::make_unique<App::EventBus>(std::initializer_list<App::IEventSource*> { g_inputManager.get(), g_commMgr.get() });
 
   // 6. StateMachine を生成して初期ステートの Enter()/Render() を実行する
   //    buildStateArray() でステートの生成と StateMachine への所有権移譲を行う
-  g_stateMachine = std::make_unique<App::StateMachine>(
-      buildStateArray(),
-      App::StateId::Boot,
-      App::UpdateContext { Driver::GetTick() },
-      App::RenderContext { g_rightOled, g_leftOled });
+  g_stateMachine = std::make_unique<App::StateMachine>(buildStateArray(), App::StateId::Boot);
 }
 
 void loop(void) {
-  // 全イベントソースを更新し、発生したイベントをキューに積む
-  g_eventBus->Update();
-  // ステートマシンを実行する
+  // Updateを実行する
   App::UpdateContext uctx { Driver::GetTick() };
-  App::RenderContext rctx { g_rightOled, g_leftOled };
-  g_stateMachine->Execute(uctx, g_eventBus->getQueue(), rctx);
+  bool renderRequested = g_stateMachine->ExecuteUpdate(uctx);
+
+  // Eventを処理する
+  g_eventBus->Update();
+  while(!g_eventBus->getQueue().empty()) {
+    const auto &event = g_eventBus->getQueue().pop().value();
+    renderRequested |= g_stateMachine->ExecuteEvent(event);
+  }
+
+  // Renderを実行する
+  if(renderRequested) {
+    App::RenderContext rctx { g_rightOled, g_leftOled };
+    g_stateMachine->ExecuteRender(rctx);
+  }
 }

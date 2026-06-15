@@ -8,51 +8,41 @@
 namespace App {
 
   StateMachine::StateMachine(StateArray stateArray,
-                             StateId initialStateId,
-                             const UpdateContext &updateCtx,
-                             const RenderContext &renderCtx) :
+                             StateId initialStateId) :
       stateArray_(std::move(stateArray)), currentStateId_(initialStateId) {
-    GetCurrentState()->Enter(updateCtx);
-    GetCurrentState()->Render(renderCtx);
+    GetCurrentState()->Enter();
   }
 
-  void StateMachine::Execute(const UpdateContext &updateCtx,
-                             EventQueue &queue,
-                             const RenderContext &renderContext) {
-    // Updateを実行して、状態遷移があれば遷移する
-    if(handleResult(GetCurrentState()->Update(updateCtx), updateCtx, renderContext)) {
-      queue.clear();
-      return;
-    }
-    // イベントキューを処理する
-    while(!queue.empty()) {
-      if(handleResult(GetCurrentState()->ProcessEvent(*queue.pop()), updateCtx, renderContext)) {
-        queue.clear();
-        return;
-      }
-    }
-  }
+  bool StateMachine::ExecuteUpdate(const UpdateContext &updateCtx) {
 
-  bool StateMachine::handleResult(const ProcessResult &result,
-                                  const UpdateContext &updateCtx,
-                                  const RenderContext &renderContext) {
-    if(result.transition.nextState.has_value()) {
-      TransitionToState(result.transition.nextState.value(), updateCtx, renderContext);
+    auto ret = GetCurrentState()->Update(updateCtx);
+
+    if(ret.transition.nextState.has_value()) {
+      TransitionToState(ret.transition.nextState.value());
       return true;
     }
-    if(result.renderRequested) {
-      GetCurrentState()->Render(renderContext);
-    }
-    return false;
+    return ret.renderRequested;
   }
 
-  void StateMachine::TransitionToState(StateId newState,
-                                       const UpdateContext &updateCtx,
-                                       const RenderContext &renderContext) {
+  bool StateMachine::ExecuteEvent(const Event &event) {
+
+    auto ret = GetCurrentState()->HandleEvent(event);
+
+    if(ret.transition.nextState.has_value()) {
+      TransitionToState(ret.transition.nextState.value());
+      return true;
+    }
+    return ret.renderRequested;
+  }
+
+  void StateMachine::ExecuteRender(const RenderContext &renderContext) {
+    GetCurrentState()->Render(renderContext);
+  }
+
+  void StateMachine::TransitionToState(StateId newState) {
     GetCurrentState()->Exit();
     currentStateId_ = newState;
-    GetCurrentState()->Enter(updateCtx);
-    GetCurrentState()->Render(renderContext);
+    GetCurrentState()->Enter();
   }
 
   IState* StateMachine::GetCurrentState() const {

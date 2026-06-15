@@ -27,20 +27,20 @@ namespace App {
       }
   };
 
-  struct ProcessResult {
+  struct ExecuteResult {
 
       Transition transition = Transition::None();
       bool renderRequested = false;
 
-      static const ProcessResult None() {
+      static const ExecuteResult None() {
         return {Transition::None(), false};
       }
 
-      static const ProcessResult executed(bool renderRequested = false) {
+      static const ExecuteResult executed(bool renderRequested = false) {
         return {Transition::None(), renderRequested};
       }
 
-      static const ProcessResult transitionTo(StateId sid, bool renderRequested = false) {
+      static const ExecuteResult transitionTo(StateId sid, bool renderRequested = false) {
         return {Transition::To(sid), renderRequested};
       }
   };
@@ -51,12 +51,12 @@ namespace App {
       IState() = default;
       virtual ~IState() = default;
 
-      virtual void Enter(const UpdateContext &context) = 0;
+      virtual void Enter() = 0;
       virtual void Exit() = 0;
-      virtual ProcessResult Update(const UpdateContext&) {
-        return ProcessResult::None();
+      virtual ExecuteResult Update(const UpdateContext&) {
+        return ExecuteResult::None();
       }
-      virtual ProcessResult ProcessEvent(const Event &event) = 0;
+      virtual ExecuteResult HandleEvent(const Event &event) = 0;
       virtual void Render(const RenderContext &context) = 0;
 
     private:

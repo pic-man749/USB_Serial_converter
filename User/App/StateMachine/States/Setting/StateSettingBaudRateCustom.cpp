@@ -18,7 +18,7 @@ namespace App {
 
   }
 
-  void StateSettingBaudRateCustom::Enter(const UpdateContext&) {
+  void StateSettingBaudRateCustom::Enter() {
     valueError_ = false;
     // 現在のボーレートを kMaxDigits 桁で展開する（上位桁は 0 パディング）
     uint32_t value = config_.baudRate;
@@ -39,52 +39,52 @@ namespace App {
   void StateSettingBaudRateCustom::Exit() {
   }
 
-  ProcessResult StateSettingBaudRateCustom::ProcessEvent(const Event &event) {
+  ExecuteResult StateSettingBaudRateCustom::HandleEvent(const Event &event) {
     return std::visit(Common::overload {
-      [](const NoneEvent&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const NoneEvent&) -> ExecuteResult {
+        return ExecuteResult::None();
       },
-      [this](const EncoderRotateEvent &e) -> ProcessResult {
+      [this](const EncoderRotateEvent &e) -> ExecuteResult {
         // 選択中の桁の値を 0〜9 の範囲で変更する（桁上がりなし）
         const int32_t newVal = static_cast<int32_t>(digits_[cursorDigit_]) + e.delta;
         digits_[cursorDigit_] = static_cast<uint8_t>(std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(9), newVal)));
         valueError_ = false;
-        return ProcessResult::executed(true);
+        return ExecuteResult::executed(true);
       },
-      [this](const ButtonEvent &e) -> ProcessResult {
+      [this](const ButtonEvent &e) -> ExecuteResult {
         if(e.type != ButtonEventType::kPress) {
-          return ProcessResult::None();
+          return ExecuteResult::None();
         }
         if(e.button_id == Driver::ButtonType::Right) {
           // 下位桁へ移動する
           if(cursorDigit_ < kMaxDigits - 1U) {
             ++cursorDigit_;
           }
-          return ProcessResult::executed(true);
+          return ExecuteResult::executed(true);
         }
         if(e.button_id == Driver::ButtonType::Left) {
           if(cursorDigit_ == 0U) {
             // 最上位桁でキャンセル → StateSettingBaudRate へ戻る
-            return ProcessResult::transitionTo(StateId::SettingBaudRate);
+            return ExecuteResult::transitionTo(StateId::SettingBaudRate);
           }
           --cursorDigit_;
-          return ProcessResult::executed(true);
+          return ExecuteResult::executed(true);
         }
         if(e.button_id == Driver::ButtonType::Center) {
           const uint32_t value = digitsToValue();
           if(value >= kMinBaud && value <= kMaxBaud) {
             config_.baudRate = value;
             applicable_.setBaudRate(config_.baudRate);
-            return ProcessResult::transitionTo(StateId::Setting);
+            return ExecuteResult::transitionTo(StateId::Setting);
           }
           // 範囲外の場合はエラー表示して入力を継続する
           valueError_ = true;
-          return ProcessResult::executed(true);
+          return ExecuteResult::executed(true);
         }
-        return ProcessResult::None();
+        return ExecuteResult::None();
       },
-      [](const auto&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const auto&) -> ExecuteResult {
+        return ExecuteResult::None();
       }
     }, event);
   }

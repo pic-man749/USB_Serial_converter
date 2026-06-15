@@ -18,9 +18,9 @@ namespace App {
     public:
       StateMonitorCommunication(CommunicationManager &commMgr, const AppConfig &config);
       virtual ~StateMonitorCommunication() = default;
-      void Enter(const UpdateContext &context) override;
+      void Enter() override;
       void Exit() override;
-      ProcessResult ProcessEvent(const Event &event) override;
+      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
 
     private:
@@ -38,14 +38,14 @@ namespace App {
       const AppConfig &config_;
       /** スクロールオフセット（0 = 最新データ、正方向 = 過去方向） */
       int32_t scrollOffset_;
+
       /**
        * @brief OLED 1面分を描画する
        * @param oled   描画対象の BinaryGFX インスタンス
        * @param buf    表示対象の DisplayBuffer
        * @param header ヘッダ行文字列
        */
-      void renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf,
-          const char *header) const;
+      void renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf, const char *header) const;
       /** @brief HEX 形式の1行文字列を生成する */
       static void buildHexLine(char *out, const DisplayBuffer &buf, size_t byteIndex);
       /** @brief ASCII 形式の1行文字列を生成する */

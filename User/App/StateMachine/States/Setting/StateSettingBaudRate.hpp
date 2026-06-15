@@ -20,9 +20,9 @@ namespace App {
     public:
       StateSettingBaudRate(AppConfig &config, IConfigApplicable &applicable);
       virtual ~StateSettingBaudRate() = default;
-      void Enter(const UpdateContext &context) override;
+      void Enter() override;
       void Exit() override;
-      ProcessResult ProcessEvent(const Event &event) override;
+      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
 
     private:

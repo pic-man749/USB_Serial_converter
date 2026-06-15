@@ -18,41 +18,41 @@ namespace App {
 
   }
 
-  void StateSettingUart::Enter(const UpdateContext&) {
+  void StateSettingUart::Enter() {
     cursorIndex_ = static_cast<uint8_t>(config_.selectedUart);
   }
 
   void StateSettingUart::Exit() {
   }
 
-  ProcessResult StateSettingUart::ProcessEvent(const Event &event) {
+  ExecuteResult StateSettingUart::HandleEvent(const Event &event) {
     return std::visit(Common::overload {
-      [](const NoneEvent&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const NoneEvent&) -> ExecuteResult {
+        return ExecuteResult::None();
       },
-      [this](const EncoderRotateEvent &e) -> ProcessResult {
+      [this](const EncoderRotateEvent &e) -> ExecuteResult {
         const int32_t next = static_cast<int32_t>(cursorIndex_) + e.delta;
         cursorIndex_ = static_cast<uint8_t>(std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-        return ProcessResult::executed(true);
+        return ExecuteResult::executed(true);
       },
-      [this](const ButtonEvent& e) -> ProcessResult {
+      [this](const ButtonEvent& e) -> ExecuteResult {
         if(e.type != ButtonEventType::kPress) {
-          return ProcessResult::None();
+          return ExecuteResult::None();
         }
         if(e.button_id == Driver::ButtonType::Center) {
           // 確定: 設定を更新して StateSetting へ戻る
           config_.selectedUart = static_cast<UartChannel>(cursorIndex_);
           applicable_.setChannel(config_.selectedUart);
-          return ProcessResult::transitionTo(StateId::Setting);
+          return ExecuteResult::transitionTo(StateId::Setting);
         }
         if(e.button_id == Driver::ButtonType::Left) {
           // キャンセル: 変更せずに戻る
-          return ProcessResult::transitionTo(StateId::Setting);
+          return ExecuteResult::transitionTo(StateId::Setting);
         }
-        return ProcessResult::None();
+        return ExecuteResult::None();
       },
-      [](const auto&) -> ProcessResult {
-        return ProcessResult::None();
+      [](const auto&) -> ExecuteResult {
+        return ExecuteResult::None();
       }
     }, event);
   }

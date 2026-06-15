@@ -20,27 +20,47 @@ namespace App {
       using StateArray = std::array<std::unique_ptr<IState>, static_cast<size_t>(StateId::Count)>;
 
       StateMachine(StateArray stateArray,
-                   StateId initialStateId,
-                   const UpdateContext &updateCtx,
-                   const RenderContext &renderCtx);
+                   StateId initialStateId);
 
-      void Execute(const UpdateContext &updateCtx,
-                   EventQueue &queue,
-                   const RenderContext &renderContext);
+      /**
+       * @brief ステートマシン実行：現在のステートのUpdateを呼び出す。遷移先があれば遷移する。
+       *
+       * @param updateCtx 
+       * @return true: 描画要求あり、false: 描画要求なし
+       */
+      bool ExecuteUpdate(const UpdateContext &updateCtx);
+
+      /**
+       * @brief ステートマシン実行：現在のステートのEventを呼び出す。遷移先があれば遷移する。
+       *
+       * @param event
+       * @return true: 描画要求あり、false: 描画要求なし
+       */
+      bool ExecuteEvent(const Event &event);
+
+      /**
+       * @brief ステートマシン実行：現在のステートのRenderを呼び出す。
+       *
+       * @param renderContext
+       */
+      void ExecuteRender(const RenderContext &renderContext);
 
     private:
       StateArray stateArray_;
       StateId currentStateId_;
 
-      void TransitionToState(StateId newState,
-                             const UpdateContext &updateCtx,
-                             const RenderContext &renderContext);
+      /**
+       * @brief 状態遷移
+       *
+       * @param newState 遷移先の状態ID
+       */
+      void TransitionToState(StateId newState);
 
-      // result を処理し、遷移が発生した場合は true を返す。描画が必要な場合は Render() を呼ぶ。
-      bool handleResult(const ProcessResult &result,
-                        const UpdateContext &updateCtx,
-                        const RenderContext &renderContext);
-
+      /**
+       * @brief 現在のStateを取得する
+       *
+       * @return 現在のStateへのポインタ
+       */
       IState* GetCurrentState() const;
 
   };

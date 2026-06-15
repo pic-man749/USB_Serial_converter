@@ -44,10 +44,10 @@ namespace App {
 
   /** アプリケーションイベント型 */
   using Event = std::variant<
-  NoneEvent,
-  ButtonEvent,
-  EncoderRotateEvent,
-  CommunicationDataEvent
+    NoneEvent,
+    ButtonEvent,
+    EncoderRotateEvent,
+    CommunicationDataEvent
   >;
 
 } // namespace App

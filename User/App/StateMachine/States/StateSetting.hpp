@@ -17,9 +17,9 @@ namespace App {
     public:
       explicit StateSetting(const AppConfig &config);
       virtual ~StateSetting() = default;
-      void Enter(const UpdateContext &context) override;
+      void Enter() override;
       void Exit() override;
-      ProcessResult ProcessEvent(const Event &event) override;
+      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
 
     private:

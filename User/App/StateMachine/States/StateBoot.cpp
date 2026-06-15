@@ -12,33 +12,38 @@
 namespace App {
 
   StateBoot::StateBoot() :
-      IState(), enterTime_(0U) {
+      IState(), enterTick_(0U) {
 
   }
-  void StateBoot::Enter(const UpdateContext &context) {
-    enterTime_ = context.tickMs;
+  void StateBoot::Enter() {
+    saveEnterTick_ = false;
   }
 
   void StateBoot::Exit() {
   }
 
-  ProcessResult StateBoot::Update(const UpdateContext &ctx) {
-    if(ctx.tickMs - enterTime_ >= kBootDisplayMs) {
-      return ProcessResult::transitionTo(StateId::MonitorCommunication);
+  ExecuteResult StateBoot::Update(const UpdateContext &ctx) {
+    // 初回ならTickをセーブしておく
+    if(!saveEnterTick_){
+      enterTick_ = ctx.tickMs;
     }
-    return ProcessResult::None();
+    // Tickが表示時間を超えたら遷移する
+    if(ctx.tickMs - enterTick_ >= kBootDisplayMs) {
+      return ExecuteResult::transitionTo(StateId::MonitorCommunication);
+    }
+    return ExecuteResult::None();
   }
 
-  ProcessResult StateBoot::ProcessEvent(const Event &event) {
+  ExecuteResult StateBoot::HandleEvent(const Event &event) {
     return std::visit(Common::overload {
-        [](const ButtonEvent &e) -> ProcessResult {
+        [](const ButtonEvent &e) -> ExecuteResult {
           if(e.type == ButtonEventType::kPress) {
-            return ProcessResult::transitionTo(StateId::MonitorCommunication);
+            return ExecuteResult::transitionTo(StateId::MonitorCommunication);
           }
-          return ProcessResult::None();
+          return ExecuteResult::None();
         },
-        [](const auto&) -> ProcessResult {
-          return ProcessResult::None();
+        [](const auto&) -> ExecuteResult {
+          return ExecuteResult::None();
         }
     }, event);
   }
