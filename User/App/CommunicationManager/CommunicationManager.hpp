@@ -66,6 +66,9 @@ namespace App {
       /** @brief USB→UART 方向の DisplayBuffer への const 参照を返す */
       const DisplayBuffer& getUsbToUartBuffer() const;
 
+      /** @brief 両方向の表示バッファを消去する */
+      void clearDisplayBuffers();
+
     private:
       PassthroughController passthrough_;
       DisplayBuffer uartToUsbBuffer_;

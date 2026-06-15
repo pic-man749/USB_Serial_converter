@@ -45,6 +45,9 @@ namespace App {
         [](const ButtonEvent &e) -> ExecuteResult {
           if(e.button_id == Driver::ButtonType::Center && e.type == ButtonEventType::kPress) {
             return ExecuteResult::transitionTo(StateId::Setting);
+          } else if(e.button_id == Driver::ButtonType::Left && e.type == ButtonEventType::kLongPress) {
+            commMgr_.clearDisplayBuffers();
+            return ExecuteResult::executed(true);
           }
           return ExecuteResult::None();
         }
