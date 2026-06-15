@@ -7,8 +7,12 @@
 
 namespace Driver {
 
-  Encoder::Encoder(TIM_HandleTypeDef *htim){
-    htim_ = htim;
+  Encoder::Encoder() {
+    htim_ = &htim5;
+  }
+
+  void Encoder::init(void) {
+    Start();
   }
 
   bool Encoder::Start(void){
