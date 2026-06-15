@@ -26,11 +26,14 @@ namespace App {
     // 初回ならTickをセーブしておく
     if(!saveEnterTick_){
       enterTick_ = ctx.tickMs;
+      saveEnterTick_ = true;
+      return ExecuteResult::executed(true);
     }
     // Tickが表示時間を超えたら遷移する
     if(ctx.tickMs - enterTick_ >= kBootDisplayMs) {
       return ExecuteResult::transitionTo(StateId::MonitorCommunication);
     }
+    // 念のため
     return ExecuteResult::None();
   }
 

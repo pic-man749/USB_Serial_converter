@@ -50,4 +50,9 @@ namespace App {
     return usbToUartBuffer_;
   }
 
+  void CommunicationManager::clearDisplayBuffers() {
+    uartToUsbBuffer_.clear();
+    usbToUartBuffer_.clear();
+  }
+
 } // namespace App

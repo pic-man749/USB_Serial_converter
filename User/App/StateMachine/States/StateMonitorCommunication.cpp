@@ -45,6 +45,9 @@ namespace App {
         [](const ButtonEvent &e) -> ExecuteResult {
           if(e.button_id == Driver::ButtonType::Center && e.type == ButtonEventType::kPress) {
             return ExecuteResult::transitionTo(StateId::Setting);
+          } else if(e.button_id == Driver::ButtonType::Left && e.type == ButtonEventType::kLongPress) {
+            commMgr_.clearDisplayBuffers();
+            return ExecuteResult::executed(true);
           }
           return ExecuteResult::None();
         }
@@ -71,23 +74,24 @@ namespace App {
     addText(0, 0, header);
     const size_t bufSize = buf.size();
     if(bufSize > 0U) {
-      const uint32_t bytesPerRow = (config_.displayMode == DisplayMode::Hex) ? kBytesPerHexRow : kCharsPerAsciiRow;
-      const size_t totalRows = (bufSize + bytesPerRow - 1U) / bytesPerRow;
-      // スクロール上限を計算してオフセットをクランプする
+      const bool isHex = (config_.displayMode == DisplayMode::Hex);
+      // HEX: 固定バイト幅で行数を計算する。ASCII: LF/折り返しを考慮して行数を計算する。
+      const size_t totalRows = isHex
+          ? (bufSize + kBytesPerHexRow - 1U) / kBytesPerHexRow
+          : countAsciiRows(buf);
       const int32_t maxScroll = (totalRows > kDataRows) ? static_cast<int32_t>(totalRows - kDataRows) : 0;
       const int32_t clampedOffset = std::min(scrollOffset_, maxScroll);
-      // 表示開始行（バッファ内の行インデックス）
       // clampedOffset=0 のとき最新データが最下行に並ぶ
       const int32_t startRow = static_cast<int32_t>(totalRows) - static_cast<int32_t>(kDataRows) - clampedOffset;
-      // 各データ行の文字列を構築してオブジェクトを追加する
-      // update() 呼び出し前に lines[] が有効であれば良い
       char lines[kDataRows][kMaxLineLen + 1U];
       for(uint8_t row = 0U; row < kDataRows; ++row) {
         lines[row][0] = '\0';
         const int32_t bufRow = startRow + static_cast<int32_t>(row);
         if(bufRow >= 0 && static_cast<size_t>(bufRow) < totalRows) {
-          const size_t byteIndex = static_cast<size_t>(bufRow) * bytesPerRow;
-          if(config_.displayMode == DisplayMode::Hex) {
+          const size_t byteIndex = isHex
+              ? static_cast<size_t>(bufRow) * kBytesPerHexRow
+              : getAsciiRowStart(buf, static_cast<size_t>(bufRow));
+          if(isHex) {
             buildHexLine(lines[row], buf, byteIndex);
           } else {
             buildAsciiLine(lines[row], buf, byteIndex);
@@ -124,10 +128,59 @@ namespace App {
         break;
       }
       const uint8_t b = buf.at(idx);
-      // 印字可能な ASCII 文字はそのまま、それ以外は '.' で代替する
+      // LF/CR は行終端として扱い、表示しない
+      if(b == '\n' || b == '\r') {
+        break;
+      }
       out[pos++] = (b >= 0x20U && b <= 0x7EU) ? static_cast<char>(b) : '.';
     }
     out[pos] = '\0';
+  }
+
+  size_t StateMonitorCommunication::countAsciiRows(const DisplayBuffer &buf) {
+    if(buf.size() == 0U) {
+      return 0U;
+    }
+    size_t rows = 1U;
+    size_t colInRow = 0U;
+    for(size_t i = 0U; i < buf.size(); ++i) {
+      const uint8_t b = buf.at(i);
+      if(b == '\n') {
+        ++rows;
+        colInRow = 0U;
+      } else if(b != '\r') {
+        if(++colInRow == kCharsPerAsciiRow) {
+          ++rows;
+          colInRow = 0U;
+        }
+      }
+    }
+    return rows;
+  }
+
+  size_t StateMonitorCommunication::getAsciiRowStart(const DisplayBuffer &buf, size_t rowIndex) {
+    if(rowIndex == 0U) {
+      return 0U;
+    }
+    size_t row = 0U;
+    size_t colInRow = 0U;
+    for(size_t i = 0U; i < buf.size(); ++i) {
+      const uint8_t b = buf.at(i);
+      bool newRow = false;
+      if(b == '\n') {
+        newRow = true;
+        colInRow = 0U;
+      } else if(b != '\r') {
+        if(++colInRow == kCharsPerAsciiRow) {
+          newRow = true;
+          colInRow = 0U;
+        }
+      }
+      if(newRow && ++row == rowIndex) {
+        return i + 1U;
+      }
+    }
+    return buf.size();
   }
 
   char StateMonitorCommunication::nibbleToHex(uint8_t n) {
