@@ -93,10 +93,7 @@ namespace {
 // ----------------------------------------------------------------------------
 void setup(void) {
   // OLED起動待ち(100ms)
-  uint32_t startTick = Driver::GetTick();
-  while(Driver::GetTick() - startTick < 100) {
-    ;
-  }
+  Driver::DelayMs(100);
 
   // 1. UART ドライバを生成する
   g_uart1 = std::make_unique<Driver::Uart>(&huart1, kUartBufSize);
