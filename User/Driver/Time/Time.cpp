@@ -12,4 +12,8 @@ namespace Driver {
     return HAL_GetTick();
   }
 
+  void DelayMs(uint32_t ms){
+    HAL_Delay(ms);
+  }
+
 }
