@@ -13,7 +13,7 @@
 namespace App {
 
   StateMonitorCommunication::StateMonitorCommunication(CommunicationManager &commMgr, const AppConfig &config) :
-      IState(), commMgr_(commMgr), config_(config), scrollOffset_(0) {
+      IState(), commMgr_(commMgr), config_(config), scrollOffset_(0), maxScroll_(0) {
 
   }
 
@@ -39,7 +39,7 @@ namespace App {
         },
         [this](const EncoderRotateEvent &e) -> ExecuteResult {
           // スクロールオフセットを更新する（0 以上でクランプ）
-          scrollOffset_ = std::max(static_cast<int32_t>(0), scrollOffset_ + e.delta);
+          scrollOffset_ = std::max(static_cast<int32_t>(0), std::min(maxScroll_, scrollOffset_ + e.delta));
           return ExecuteResult::executed(true);
         },
         [this](const ButtonEvent &e) -> ExecuteResult {
@@ -61,7 +61,7 @@ namespace App {
 
   // ---------------------------------------------------------------------------
   void StateMonitorCommunication::renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf,
-                                             const char *header) const {
+                                             const char *header) {
     oled.removeAll();
 
     // TextObject 生成ヘルパー（charSpacing=1 で 6px ピッチ）
@@ -81,8 +81,8 @@ namespace App {
       const size_t totalRows = isHex
           ? (bufSize + kBytesPerHexRow - 1U) / kBytesPerHexRow
           : countAsciiRows(buf);
-      const int32_t maxScroll = (totalRows > kDataRows) ? static_cast<int32_t>(totalRows - kDataRows) : 0;
-      const int32_t clampedOffset = std::min(scrollOffset_, maxScroll);
+      maxScroll_ = (totalRows > kDataRows) ? static_cast<int32_t>(totalRows - kDataRows) : 0;
+      const int32_t clampedOffset = std::min(scrollOffset_, maxScroll_);
       // clampedOffset=0 のとき最新データが最下行に並ぶ
       const int32_t startRow = static_cast<int32_t>(totalRows) - static_cast<int32_t>(kDataRows) - clampedOffset;
       char lines[kDataRows][kMaxLineLen + 1U];
