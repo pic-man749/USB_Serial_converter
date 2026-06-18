@@ -38,6 +38,8 @@ namespace App {
       const AppConfig &config_;
       /** スクロールオフセット（0 = 最新データ、正方向 = 過去方向） */
       int32_t scrollOffset_;
+      /** 最大スクロール数 */
+      int32_t maxScroll_;
 
       /**
        * @brief OLED 1面分を描画する
@@ -45,7 +47,7 @@ namespace App {
        * @param buf    表示対象の DisplayBuffer
        * @param header ヘッダ行文字列
        */
-      void renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf, const char *header) const;
+      void renderOled(BinaryGFX::BinaryGFX &oled, const DisplayBuffer &buf, const char *header);
       /** @brief HEX 形式の1行文字列を生成する */
       static void buildHexLine(char *out, const DisplayBuffer &buf, size_t byteIndex);
       /**
