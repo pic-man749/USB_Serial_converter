@@ -13,7 +13,7 @@ extern "C" {
 
 namespace Driver {
 
-  Common::Queue UsbCdc::receiveQueue_(RECEIVE_QUEUE_SIZE);
+  Common::RingBuffer<uint8_t> UsbCdc::receiveQueue_(RECEIVE_QUEUE_SIZE);
   bool UsbCdc::isSending_ = false;
   std::unique_ptr<uint8_t[]> UsbCdc::sendBuffer_ = nullptr;
   uint16_t UsbCdc::sendBufferSize_ = 0;
