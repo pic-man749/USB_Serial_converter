@@ -7,7 +7,7 @@
 #ifndef DRIVER_USB_CDC_USBCDC_HPP_
 #define DRIVER_USB_CDC_USBCDC_HPP_
 
-#include "Common/Queue/Queue.hpp"
+#include "Common/RingBuffer/RingBuffer.hpp"
 #include <cstdint>
 #include <memory>
 
@@ -77,7 +77,7 @@ namespace Driver {
 
       static constexpr uint32_t RECEIVE_QUEUE_SIZE = 1024;
 
-      static Common::Queue receiveQueue_;
+      static Common::RingBuffer<uint8_t> receiveQueue_;
       static bool isSending_;
       static std::unique_ptr<uint8_t[]> sendBuffer_;
       static uint16_t sendBufferSize_;
