@@ -7,15 +7,15 @@
 #ifndef APP_EVENT_EVENTQUEUE_HPP_
 #define APP_EVENT_EVENTQUEUE_HPP_
 
-#include <array>
 #include <optional>
 #include "Event.hpp"
+#include "Common/RingBuffer/RingBuffer.hpp"
 
 namespace App {
 
   class EventQueue {
     public:
-      static constexpr size_t kCapacity = 16U;
+      static constexpr uint32_t kCapacity = 16U;
 
       EventQueue();
 
@@ -31,10 +31,7 @@ namespace App {
       void clear();
 
     private:
-      std::array<Event, kCapacity> buffer_;
-      size_t head_;
-      size_t tail_;
-      size_t count_;
+      Common::RingBuffer<Event> buffer_;
   };
 
 } // namespace App
