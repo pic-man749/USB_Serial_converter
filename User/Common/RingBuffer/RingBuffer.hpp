@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 namespace Common {
 
@@ -55,6 +56,20 @@ namespace Common {
       }
 
       /**
+       * @brief データをキューへ1要素追加する
+       * @details overwrite が false の場合、空き容量が不足していると追加しない。
+       *          overwrite が true の場合、満杯時は最古の要素を破棄してから追加する。
+       * @param item 追加する要素
+       * @param overwrite 満杯時に最古の要素を上書きするかどうか
+       */
+      void push(const T &item, bool overwrite = false) {
+        if(overwrite && full()) {
+          pop();
+        }
+        push(&item, 1);
+      }
+
+      /**
        * @brief キューの先頭からデータを取り出す
        * @param item 取り出したデータの格納先バッファ
        * @param size 取り出す要素数
@@ -71,6 +86,20 @@ namespace Common {
         }
 
         return true;
+      }
+
+      /**
+       * @brief キューの先頭から1要素取り出す
+       * @return 成功時は取り出した要素、データ不足時は std::nullopt
+       */
+      std::optional<T> pop() {
+        if(receivedSize() == 0) {
+          return std::nullopt;
+        }
+
+        std::optional<T> item(buffer_[tail_]);
+        tail_ = (tail_ + 1) % maxSize_;
+        return item;
       }
 
       /**
@@ -100,6 +129,30 @@ namespace Common {
       uint32_t receivedSize() const {
         // head_ が tail_ を追い越して折り返した場合も正しく算出する
         return (head_ - tail_ + maxSize_) % maxSize_;
+      }
+
+      /**
+       * @brief キューが空かどうかを返す
+       * @return 空の場合 true
+       */
+      bool empty() const {
+        return head_ == tail_;
+      }
+
+      /**
+       * @brief キューが満杯かどうかを返す
+       * @return 満杯の場合 true
+       */
+      bool full() const {
+        return receivedSize() == maxSize_ - 1;
+      }
+
+      /**
+       * @brief キュー内のデータをすべて破棄する
+       */
+      void clear() {
+        head_ = 0;
+        tail_ = 0;
       }
 
     private:
