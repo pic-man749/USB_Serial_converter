@@ -4,71 +4,34 @@
  *      Author: picman
  */
 #include "StateSetting.hpp"
-#include <variant>
 #include <memory>
-#include <algorithm>
 #include <cstdio>
-#include "Common/OverloadHelper.hpp"
 #include "BinaryGFX.hpp"
 
 namespace App {
 
       StateSetting::StateSetting(const AppConfig& config) :
-          IState(), config_(config), cursorIndex_(0U) {
+          CursorMenuState(kItemCount), config_(config) {
 
   }
 
   void StateSetting::Enter() {
-    cursorIndex_ = 0U;
+    SetCursorIndex(0U);
   }
 
-  void StateSetting::Exit() {
-  }
-
-  ExecuteResult StateSetting::HandleEvent(const Event& event) {
-    return std::visit(Common::overload {
-      [](const NoneEvent&) -> ExecuteResult {
-        return ExecuteResult::None();
-      },
-      [this](const EncoderRotateEvent& e) -> ExecuteResult {
-        const int32_t next = static_cast<int32_t>(cursorIndex_) + e.delta;
-        cursorIndex_ = static_cast<uint8_t>(
-            std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-        return ExecuteResult::executed(true);
-      },
-      [this](const ButtonEvent& e) -> ExecuteResult {
-        if(e.type != ButtonEventType::kPress) {
-          return ExecuteResult::None();
-        }
-        if(e.button_id == Driver::ButtonType::Center) {
-          switch(cursorIndex_) {
-            case 0U: return ExecuteResult::transitionTo(StateId::SettingUart);
-            case 1U: return ExecuteResult::transitionTo(StateId::SettingBaudRate);
-            case 2U: return ExecuteResult::transitionTo(StateId::SettingFormat);
-            default: break;
-          }
-        }
-        if(e.button_id == Driver::ButtonType::Left) {
-          return ExecuteResult::transitionTo(StateId::MonitorCommunication);
-        }
-        if(e.button_id == Driver::ButtonType::Top){
-          const int32_t next = static_cast<int32_t>(cursorIndex_) - 1;
-          cursorIndex_ = static_cast<uint8_t>(
-              std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-          return ExecuteResult::executed(true);
-        }
-        if(e.button_id == Driver::ButtonType::Bottom){
-          const int32_t next = static_cast<int32_t>(cursorIndex_) + 1;
-          cursorIndex_ = static_cast<uint8_t>(
-              std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-          return ExecuteResult::executed(true);
-        }
-        return ExecuteResult::None();
-      },
-      [](const auto&) -> ExecuteResult {
-        return ExecuteResult::None();
+  ExecuteResult StateSetting::HandleSelection(const ButtonEvent& e) {
+    if(e.button_id == Driver::ButtonType::Center) {
+      switch(cursorIndex_) {
+        case 0U: return ExecuteResult::transitionTo(StateId::SettingUart);
+        case 1U: return ExecuteResult::transitionTo(StateId::SettingBaudRate);
+        case 2U: return ExecuteResult::transitionTo(StateId::SettingFormat);
+        default: break;
       }
-    }, event);
+    }
+    if(e.button_id == Driver::ButtonType::Left) {
+      return ExecuteResult::transitionTo(StateId::MonitorCommunication);
+    }
+    return ExecuteResult::None();
   }
 
   void StateSetting::Render(const RenderContext& context) {

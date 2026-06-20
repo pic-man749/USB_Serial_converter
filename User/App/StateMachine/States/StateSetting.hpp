@@ -7,27 +7,26 @@
 #ifndef APP_STATEMACHINE_STATES_STATESETTING_HPP_
 #define APP_STATEMACHINE_STATES_STATESETTING_HPP_
 #include <cstdint>
-#include "../IState.hpp"
+#include "Base/CursorMenuState.hpp"
 #include "../../AppConfig/AppConfig.hpp"
 
 namespace App {
 
-  class StateSetting: public IState {
+  class StateSetting: public CursorMenuState {
 
     public:
       explicit StateSetting(const AppConfig &config);
       virtual ~StateSetting() = default;
       void Enter() override;
-      void Exit() override;
-      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
+
+    protected:
+      ExecuteResult HandleSelection(const ButtonEvent &event) override;
 
     private:
       /** メニュー項目数 */
       static constexpr uint8_t kItemCount = 3U;
       const AppConfig &config_;
-      /** 選択中の項目インデックス（0: UART / 1: BaudRate / 2: Format） */
-      uint8_t cursorIndex_;
       /** @brief 右 OLED にメニューを描画する */
       void drawMenu(BinaryGFX::BinaryGFX &oled) const;
   };
