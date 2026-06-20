@@ -43,6 +43,7 @@ namespace App {
           // 確定: 設定を更新して StateSetting へ戻る
           config_.selectedUart = static_cast<UartChannel>(cursorIndex_);
           applicable_.setChannel(config_.selectedUart);
+          applicable_.setBaudRate(config_.baudRate);
           return ExecuteResult::transitionTo(StateId::Setting);
         }
         if(e.button_id == Driver::ButtonType::Left) {
