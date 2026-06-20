@@ -72,7 +72,6 @@ namespace App {
       std::array<Driver::Uart*, 3> uarts_;
       Driver::UsbCdc &usbCdc_;
       UartChannel currentChannel_;
-      uint32_t currentBaudRate_;
       bool running_;
 
       Driver::Uart& getActiveUart();

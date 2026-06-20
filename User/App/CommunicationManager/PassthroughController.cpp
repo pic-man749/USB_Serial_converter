@@ -14,8 +14,7 @@ namespace App {
       Driver::UsbCdc &usbCdc,
       UartChannel initialChannel, uint32_t initialBaudRate) :
       uarts_ { &uart1, &uart2, &uart3 }, usbCdc_(usbCdc),
-      currentChannel_(initialChannel), currentBaudRate_(initialBaudRate),
-      running_(false) {
+      currentChannel_(initialChannel), running_(false) {
   }
 
   void PassthroughController::start() {
@@ -48,14 +47,10 @@ namespace App {
   }
 
   void PassthroughController::setBaudRate(uint32_t baudRate) {
-    if(baudRate == currentBaudRate_) {
-      return;
-    }
-    currentBaudRate_ = baudRate;
     if(running_) {
       // DeInit/Init で DMA が停止するため、前後に受信停止・再開を行い readPos_ をリセットする
       getActiveUart().stopReceive();
-      getActiveUart().setbaudrate(currentBaudRate_);
+      getActiveUart().setbaudrate(baudRate);
       getActiveUart().startReceive();
     }
   }
