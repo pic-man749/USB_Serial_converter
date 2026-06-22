@@ -46,13 +46,15 @@ namespace App {
     }
   }
 
-  void PassthroughController::setBaudRate(uint32_t baudRate) {
+  bool PassthroughController::setBaudRate(uint32_t baudRate) {
+    bool ret = false;
     if(running_) {
       // DeInit/Init で DMA が停止するため、前後に受信停止・再開を行い readPos_ をリセットする
       getActiveUart().stopReceive();
-      getActiveUart().setbaudrate(baudRate);
+      ret = getActiveUart().setbaudrate(baudRate);
       getActiveUart().startReceive();
     }
+    return ret;
   }
 
   bool PassthroughController::transfer(DisplayBuffer &uartToUsb, DisplayBuffer &usbToUart) {
