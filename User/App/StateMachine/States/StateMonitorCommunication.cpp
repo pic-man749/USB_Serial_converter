@@ -77,7 +77,7 @@ namespace App {
     };
 
     addText(0, 0, header);
-    oled.addObject(std::make_unique<BinaryGFX::LineObject>(0, 7, 127, 7));
+    // oled.addObject(std::make_unique<BinaryGFX::LineObject>(0, 7, 127, 7));
 
     const size_t bufSize = buf.size();
     if(bufSize > 0U) {
