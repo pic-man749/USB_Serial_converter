@@ -24,7 +24,7 @@ namespace App {
 
   ExecuteResult StateBoot::Update(const UpdateContext &ctx) {
     // 初回ならTickをセーブしておく
-    if(!saveEnterTick_){
+    if(!saveEnterTick_) {
       enterTick_ = ctx.tickMs;
       saveEnterTick_ = true;
       return ExecuteResult::executed(true);
@@ -54,12 +54,10 @@ namespace App {
   void StateBoot::Render(const RenderContext &context) {
     for(auto *oled : { context.LeftOled.get(), context.RightOled.get() }) {
       oled->removeAll();
-      auto title = std::make_unique<BinaryGFX::TextObject>(20, 24, "USB-UART",
-          &BinaryGFX::BgfxFont_Ascii);
+      auto title = std::make_unique<BinaryGFX::TextObject>(40, 24, "USB-UART", &BinaryGFX::BgfxFont_Ascii);
       title->setCharSpacing(1U);
       oled->addObject(std::move(title));
-      auto sub = std::make_unique<BinaryGFX::TextObject>(13, 40, "CONVERTER",
-          &BinaryGFX::BgfxFont_Ascii);
+      auto sub = std::make_unique<BinaryGFX::TextObject>(37, 40, "CONVERTER", &BinaryGFX::BgfxFont_Ascii);
       sub->setCharSpacing(1U);
       oled->addObject(std::move(sub));
       oled->update();

@@ -16,7 +16,7 @@ namespace App {
     public:
       virtual ~IConfigApplicable() = default;
       virtual void setChannel(UartChannel channel) = 0;
-      virtual void setBaudRate(uint32_t baudRate) = 0;
+      virtual bool setBaudRate(uint32_t baudRate) = 0;
   };
 
 } // namespace App

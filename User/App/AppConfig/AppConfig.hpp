@@ -23,13 +23,15 @@ namespace App {
     UART3
   };
 
-  const char *GetUartChannelStr(UartChannel ch);
+  const char* GetUartChannelStr(UartChannel ch);
 
   /** OLED の表示形式 */
   enum class DisplayMode : uint8_t {
     Hex,
     Ascii
   };
+
+  const char* GetDisplayModeStr(DisplayMode mode);
 
   struct AppConfig {
       UartChannel selectedUart = UartChannel::UART1;

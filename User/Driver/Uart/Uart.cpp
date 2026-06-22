@@ -28,8 +28,17 @@ namespace Driver {
     HAL_UART_AbortTransmit(huart_);
     isSending_ = false;
     HAL_UART_DeInit(huart_);
+
+    // バックアップを取ってから設定する, 失敗したら元に戻す
+    uint32_t bkup = huart_->Init.BaudRate;
     huart_->Init.BaudRate = baudrate;
-    return HAL_UART_Init(huart_) == HAL_OK;
+    if(HAL_UART_Init(huart_) == HAL_OK){
+      return true;
+    }
+    // フォールバック
+    huart_->Init.BaudRate = bkup;
+    HAL_UART_Init(huart_);
+    return false;
   }
 
   void Uart::TxCpltCallback(UART_HandleTypeDef *huart) {

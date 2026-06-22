@@ -4,69 +4,34 @@
  *      Author: picman
  */
 #include "StateSettingUart.hpp"
-#include <variant>
 #include <memory>
-#include <algorithm>
 #include <cstdio>
-#include "Common/OverloadHelper.hpp"
 #include "BinaryGFX.hpp"
 
 namespace App {
 
   StateSettingUart::StateSettingUart(AppConfig &config, IConfigApplicable &applicable) :
-      IState(), config_(config), applicable_(applicable), cursorIndex_(0U) {
+      CursorMenuState(kItemCount), config_(config), applicable_(applicable) {
 
   }
 
   void StateSettingUart::Enter() {
-    cursorIndex_ = static_cast<uint8_t>(config_.selectedUart);
+    SetCursorIndex(static_cast<uint8_t>(config_.selectedUart));
   }
 
-  void StateSettingUart::Exit() {
-  }
-
-  ExecuteResult StateSettingUart::HandleEvent(const Event &event) {
-    return std::visit(Common::overload {
-      [](const NoneEvent&) -> ExecuteResult {
-        return ExecuteResult::None();
-      },
-      [this](const EncoderRotateEvent &e) -> ExecuteResult {
-        const int32_t next = static_cast<int32_t>(cursorIndex_) + e.delta;
-        cursorIndex_ = static_cast<uint8_t>(std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-        return ExecuteResult::executed(true);
-      },
-      [this](const ButtonEvent& e) -> ExecuteResult {
-        if(e.type != ButtonEventType::kPress) {
-          return ExecuteResult::None();
-        }
-        if(e.button_id == Driver::ButtonType::Center) {
-          // 確定: 設定を更新して StateSetting へ戻る
-          config_.selectedUart = static_cast<UartChannel>(cursorIndex_);
-          applicable_.setChannel(config_.selectedUart);
-          return ExecuteResult::transitionTo(StateId::Setting);
-        }
-        if(e.button_id == Driver::ButtonType::Left) {
-          // キャンセル: 変更せずに戻る
-          return ExecuteResult::transitionTo(StateId::Setting);
-        }
-        if(e.button_id == Driver::ButtonType::Top){
-          const int32_t next = static_cast<int32_t>(cursorIndex_) - 1;
-          cursorIndex_ = static_cast<uint8_t>(
-              std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-          return ExecuteResult::executed(true);
-        }
-        if(e.button_id == Driver::ButtonType::Bottom){
-          const int32_t next = static_cast<int32_t>(cursorIndex_) + 1;
-          cursorIndex_ = static_cast<uint8_t>(
-              std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(kItemCount - 1U), next)));
-          return ExecuteResult::executed(true);
-        }
-        return ExecuteResult::None();
-      },
-      [](const auto&) -> ExecuteResult {
-        return ExecuteResult::None();
-      }
-    }, event);
+  ExecuteResult StateSettingUart::HandleSelection(const ButtonEvent &e) {
+    if(e.button_id == Driver::ButtonType::Center) {
+      // 確定: 設定を更新して StateSetting へ戻る
+      config_.selectedUart = static_cast<UartChannel>(cursorIndex_);
+      applicable_.setChannel(config_.selectedUart);
+      applicable_.setBaudRate(config_.baudRate);
+      return ExecuteResult::transitionTo(StateId::Setting);
+    }
+    if(e.button_id == Driver::ButtonType::Left) {
+      // キャンセル: 変更せずに戻る
+      return ExecuteResult::transitionTo(StateId::Setting);
+    }
+    return ExecuteResult::None();
   }
 
   void StateSettingUart::Render(const RenderContext &context) {

@@ -38,8 +38,8 @@ namespace App {
     passthrough_.setChannel(channel);
   }
 
-  void CommunicationManager::setBaudRate(uint32_t baudRate) {
-    passthrough_.setBaudRate(baudRate);
+  bool CommunicationManager::setBaudRate(uint32_t baudRate) {
+    return passthrough_.setBaudRate(baudRate);
   }
 
   const DisplayBuffer& CommunicationManager::getUartToUsbBuffer() const {

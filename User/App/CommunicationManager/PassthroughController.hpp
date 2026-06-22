@@ -54,8 +54,9 @@ namespace App {
       /**
        * @brief ボーレートを変更する。
        *        動作中の場合は受信を停止し、ボーレートを設定した後に受信を再開する。
+       * @return true 成功, false 失敗（元のボーレートに戻る）
        */
-      void setBaudRate(uint32_t baudRate);
+      bool setBaudRate(uint32_t baudRate);
 
       /**
        * @brief USB↔UART のデータ転送を1回実行する。
@@ -72,7 +73,6 @@ namespace App {
       std::array<Driver::Uart*, 3> uarts_;
       Driver::UsbCdc &usbCdc_;
       UartChannel currentChannel_;
-      uint32_t currentBaudRate_;
       bool running_;
 
       Driver::Uart& getActiveUart();

@@ -19,4 +19,14 @@ namespace App {
     return reinterpret_cast<const char*>("UNKNOWN");
   }
 
+  const char* GetDisplayModeStr(DisplayMode mode) {
+    switch(mode) {
+      case DisplayMode::Ascii:
+        return reinterpret_cast<const char*>("ASCII");
+      case DisplayMode::Hex:
+        return reinterpret_cast<const char*>("HEX");
+    }
+    return reinterpret_cast<const char*>("UNKNOWN");
+  }
+
 }
