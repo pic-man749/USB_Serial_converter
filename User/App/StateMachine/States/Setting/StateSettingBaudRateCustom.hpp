@@ -39,10 +39,13 @@ namespace App {
       uint8_t cursorDigit_;
       /** 範囲外エラーフラグ */
       bool valueError_;
+      /** 設定失敗フラグ */
+      bool isSettingFailed_;
       /** @brief digits_ の内容を数値に変換する */
       uint32_t digitsToValue() const;
       /** @brief 右 OLED に桁入力画面を描画する */
       void drawScreen(BinaryGFX::BinaryGFX &oled) const;
+
   };
 
 } // namespace App

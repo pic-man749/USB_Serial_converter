@@ -58,7 +58,7 @@ namespace App {
       void setChannel(UartChannel channel) override;
 
       /** @brief ボーレートを変更する。IConfigApplicable 実装。*/
-      void setBaudRate(uint32_t baudRate) override;
+      bool setBaudRate(uint32_t baudRate) override;
 
       /** @brief UART→USB 方向の DisplayBuffer への const 参照を返す */
       const DisplayBuffer& getUartToUsbBuffer() const;

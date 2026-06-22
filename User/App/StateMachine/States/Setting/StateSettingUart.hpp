@@ -6,27 +6,27 @@
 #ifndef APP_STATEMACHINE_STATES_SETTING_STATESETTINGUART_HPP_
 #define APP_STATEMACHINE_STATES_SETTING_STATESETTINGUART_HPP_
 #include <cstdint>
-#include "../../IState.hpp"
+#include "../Base/CursorMenuState.hpp"
 #include "../../../AppConfig/AppConfig.hpp"
 #include "../../../IConfigApplicable.hpp"
 
 namespace App {
 
-  class StateSettingUart: public IState {
+  class StateSettingUart: public CursorMenuState {
 
     public:
       StateSettingUart(AppConfig &config, IConfigApplicable &applicable);
       virtual ~StateSettingUart() = default;
       void Enter() override;
-      void Exit() override;
-      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
+
+    protected:
+      ExecuteResult HandleSelection(const ButtonEvent &event) override;
 
     private:
       static constexpr uint8_t kItemCount = 3U;
       AppConfig &config_;
       IConfigApplicable &applicable_;
-      uint8_t cursorIndex_;
       void drawScreen(BinaryGFX::BinaryGFX &oled) const;
   };
 } // namespace App

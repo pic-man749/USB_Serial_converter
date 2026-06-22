@@ -14,12 +14,13 @@
 namespace App {
 
   StateSettingBaudRateCustom::StateSettingBaudRateCustom(AppConfig &config, IConfigApplicable &applicable) :
-      IState(), config_(config), applicable_(applicable), digits_ { }, cursorDigit_(0U), valueError_(false) {
+      IState(), config_(config), applicable_(applicable), digits_ { }, cursorDigit_(0U), valueError_(false), isSettingFailed_(false) {
 
   }
 
   void StateSettingBaudRateCustom::Enter() {
     valueError_ = false;
+    isSettingFailed_ = false;
     // 現在のボーレートを kMaxDigits 桁で展開する（上位桁は 0 パディング）
     uint32_t value = config_.baudRate;
     uint32_t divisor = 1U;
@@ -49,6 +50,7 @@ namespace App {
           const int32_t newVal = static_cast<int32_t>(digits_[cursorDigit_]) + e.delta;
           digits_[cursorDigit_] = static_cast<uint8_t>(std::max(static_cast<int32_t>(0), std::min(static_cast<int32_t>(9), newVal)));
           valueError_ = false;
+          isSettingFailed_ = false;
           return ExecuteResult::executed(true);
         },
         [this](const ButtonEvent &e) -> ExecuteResult {
@@ -71,11 +73,17 @@ namespace App {
             return ExecuteResult::executed(true);
           }
           if(e.button_id == Driver::ButtonType::Center) {
+            // 決定
             const uint32_t value = digitsToValue();
             if(value >= kMinBaud && value <= kMaxBaud) {
-              config_.baudRate = value;
-              applicable_.setBaudRate(config_.baudRate);
-              return ExecuteResult::transitionTo(StateId::Setting);
+              if(applicable_.setBaudRate(value)){
+                config_.baudRate = value;
+                return ExecuteResult::transitionTo(StateId::Setting);
+              } else {
+                // HALでエラーがかえってきた場合
+                isSettingFailed_ = true;
+                return ExecuteResult::executed(true);
+              }
             }
             // 範囲外の場合はエラー表示して入力を継続する
             valueError_ = true;
@@ -133,6 +141,10 @@ namespace App {
     // エラーメッセージ
     if(valueError_) {
       addText(0, 40, "OUT OF RANGE");
+    }
+    // 失敗
+    if(isSettingFailed_){
+      addText(0, 40, "INVALID VALUE");
     }
     addText(0, 56, "[<]Back [o]OK");
     oled.update();

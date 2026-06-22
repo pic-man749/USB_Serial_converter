@@ -9,21 +9,22 @@
 #define APP_STATEMACHINE_STATES_SETTING_STATESETTINGBAUDRATE_HPP_
 #include <cstdint>
 #include <array>
-#include "../../IState.hpp"
+#include "../Base/CursorMenuState.hpp"
 #include "../../../AppConfig/AppConfig.hpp"
 #include "../../../IConfigApplicable.hpp"
 
 namespace App {
 
-  class StateSettingBaudRate: public IState {
+  class StateSettingBaudRate: public CursorMenuState {
 
     public:
       StateSettingBaudRate(AppConfig &config, IConfigApplicable &applicable);
       virtual ~StateSettingBaudRate() = default;
       void Enter() override;
-      void Exit() override;
-      ExecuteResult HandleEvent(const Event &event) override;
       void Render(const RenderContext &context) override;
+
+    protected:
+      ExecuteResult HandleSelection(const ButtonEvent &event) override;
 
     private:
       /** プリセット数（Custom... を除く） */
@@ -35,7 +36,6 @@ namespace App {
       static const std::array<uint32_t, kPresetCount> kPresets;
       AppConfig &config_;
       IConfigApplicable &applicable_;
-      uint8_t cursorIndex_;
       void drawScreen(BinaryGFX::BinaryGFX &oled) const;
   };
 
