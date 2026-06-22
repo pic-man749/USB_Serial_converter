@@ -20,6 +20,11 @@ namespace App {
   void StateMonitorCommunication::Enter() {
     commMgr_.start();
     scrollOffset_ = 0;
+
+    snprintf(headerLeft_, sizeof(headerLeft_), "%s->USB %lu", GetUartChannelStr(config_.selectedUart),
+        config_.baudRate);
+    snprintf(headerRight_, sizeof(headerRight_), "USB->%s %s", GetUartChannelStr(config_.selectedUart),
+        GetDisplayModeStr(config_.displayMode));
   }
 
   void StateMonitorCommunication::Exit() {
@@ -55,8 +60,8 @@ namespace App {
   }
 
   void StateMonitorCommunication::Render(const RenderContext &context) {
-    renderOled(*context.LeftOled, commMgr_.getUartToUsbBuffer(), "UART->USB");
-    renderOled(*context.RightOled, commMgr_.getUsbToUartBuffer(), "USB->UART");
+    renderOled(*context.LeftOled, commMgr_.getUartToUsbBuffer(), headerLeft_);
+    renderOled(*context.RightOled, commMgr_.getUsbToUartBuffer(), headerRight_);
   }
 
   // ---------------------------------------------------------------------------
@@ -79,8 +84,9 @@ namespace App {
       const bool isHex = (config_.displayMode == DisplayMode::Hex);
       // HEX: 固定バイト幅で行数を計算する。ASCII: LF/折り返しを考慮して行数を計算する。
       const size_t totalRows = isHex
-          ? (bufSize + kBytesPerHexRow - 1U) / kBytesPerHexRow
-          : countAsciiRows(buf);
+                               ? (bufSize + kBytesPerHexRow - 1U) / kBytesPerHexRow
+                                 :
+                                 countAsciiRows(buf);
       maxScroll_ = (totalRows > kDataRows) ? static_cast<int32_t>(totalRows - kDataRows) : 0;
       const int32_t clampedOffset = std::min(scrollOffset_, maxScroll_);
       // clampedOffset=0 のとき最新データが最下行に並ぶ
@@ -91,8 +97,9 @@ namespace App {
         const int32_t bufRow = startRow + static_cast<int32_t>(row);
         if(bufRow >= 0 && static_cast<size_t>(bufRow) < totalRows) {
           const size_t byteIndex = isHex
-              ? static_cast<size_t>(bufRow) * kBytesPerHexRow
-              : getAsciiRowStart(buf, static_cast<size_t>(bufRow));
+                                   ? static_cast<size_t>(bufRow) * kBytesPerHexRow
+                                     :
+                                     getAsciiRowStart(buf, static_cast<size_t>(bufRow));
           if(isHex) {
             buildHexLine(lines[row], buf, byteIndex);
           } else {

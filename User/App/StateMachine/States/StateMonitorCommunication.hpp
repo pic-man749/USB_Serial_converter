@@ -40,6 +40,10 @@ namespace App {
       int32_t scrollOffset_;
       /** 最大スクロール数 */
       int32_t maxScroll_;
+      /** 左画面ヘッダ */
+      char headerLeft_[22];
+      /** 右画面ヘッダ */
+      char headerRight_[22];
 
       /**
        * @brief OLED 1面分を描画する
