@@ -16,6 +16,7 @@ namespace App {
     SettingBaudRate,
     SettingBaudRateCustom,
     SettingFormat,
+    Debug,
     Count
   };
 }

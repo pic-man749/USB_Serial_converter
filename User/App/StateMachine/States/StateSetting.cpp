@@ -28,6 +28,8 @@ namespace App {
           return ExecuteResult::transitionTo(StateId::SettingBaudRate);
         case 2U:
           return ExecuteResult::transitionTo(StateId::SettingFormat);
+        case 3U:
+          return ExecuteResult::transitionTo(StateId::Debug);
         default:
           break;
       }
@@ -72,6 +74,11 @@ namespace App {
     char line2[22];
     snprintf(line2, sizeof(line2), "%c MODE : %s", (cursorIndex_ == 2U) ? '>' : ' ', modeStr);
     addText(0, 24, line2);
+
+    // Debug 項目
+    char line3[22];
+    snprintf(line3, sizeof(line3), "%c Debug", (cursorIndex_ == 3U) ? '>' : ' ');
+    addText(0, 32, line3);
 
     // フッタ行
     addText(0, 56, "[<]Back [o]Enter");

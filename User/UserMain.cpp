@@ -19,6 +19,7 @@
 #include "App/StateMachine/States/Setting/StateSettingBaudRate.hpp"
 #include "App/StateMachine/States/Setting/StateSettingBaudRateCustom.hpp"
 #include "App/StateMachine/States/Setting/StateSettingFormat.hpp"
+#include "App/StateMachine/States/StateDebug.hpp"
 // ドライバ層
 #include "Driver/Uart/Uart.hpp"
 #include "Driver/USB_CDC/UsbCdc.hpp"
@@ -66,7 +67,7 @@ namespace {
   // StateId とステートインスタンスの対応を明示的に設定する
   App::StateMachine::StateArray buildStateArray() {
     // StateId が追加された場合にコンパイルエラーで buildStateArray() の更新漏れを検出する
-    static_assert(static_cast<size_t>(App::StateId::Count) == 7U,
+    static_assert(static_cast<size_t>(App::StateId::Count) == 8U,
         "StateId が追加されました。buildStateArray() を更新してください。");
 
     App::StateMachine::StateArray arr { };
@@ -85,6 +86,8 @@ namespace {
         std::make_unique<App::StateSettingBaudRateCustom>(g_config, *g_commMgr);
     arr[static_cast<size_t>(App::StateId::SettingFormat)] =
         std::make_unique<App::StateSettingFormat>(g_config);
+    arr[static_cast<size_t>(App::StateId::Debug)] =
+        std::make_unique<App::StateDebug>(g_config);
 
     return arr;
   }
