@@ -25,7 +25,7 @@ namespace App {
 
     private:
       /** メニュー項目数 */
-      static constexpr uint8_t kItemCount = 3U;
+      static constexpr uint8_t kItemCount = 4U;
       const AppConfig &config_;
       /** @brief 右 OLED にメニューを描画する */
       void drawMenu(BinaryGFX::BinaryGFX &oled) const;
