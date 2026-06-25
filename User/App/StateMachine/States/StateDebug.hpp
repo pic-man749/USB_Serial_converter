@@ -1,0 +1,54 @@
+/*
+ * StateDebug.hpp
+ *
+ *      Author: picman
+ */
+
+#ifndef APP_STATEMACHINE_STATES_STATEDEBUG_HPP_
+#define APP_STATEMACHINE_STATES_STATEDEBUG_HPP_
+
+#include <cstdint>
+#include "../IState.hpp"
+#include "../../AppConfig/AppConfig.hpp"
+#include "BinaryGFX.hpp"
+
+namespace App {
+
+  class StateDebug : public IState{
+
+    public:
+      explicit StateDebug(const AppConfig &config);
+      virtual ~StateDebug() = default;
+      void Enter() override;
+      void Exit() override;
+      ExecuteResult HandleEvent(const Event &event) override;
+      void Render(const RenderContext &context) override;
+
+    private:
+      const AppConfig &config_;
+
+      bool isObjectCreated_;
+
+      void CreateObject(const RenderContext &context);
+
+      // obj ids
+      BinaryGFX::ObjectId oidBtnT_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::ObjectId oidBtnL_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::ObjectId oidBtnR_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::ObjectId oidBtnB_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::ObjectId oidBtnC_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::ObjectId oidEncStr_ = BinaryGFX::InvalidObjectId;
+
+      bool isPressedBtnT_ = false;
+      bool isPressedBtnL_ = false;
+      bool isPressedBtnR_ = false;
+      bool isPressedBtnB_ = false;
+      bool isPressedBtnC_ = false;
+
+      // encoder変化量の合計
+      int32_t encDeltaSum_ = 0;
+  };
+
+} // namespace App
+
+#endif /* APP_STATEMACHINE_STATES_STATEDEBUG_HPP_ */
