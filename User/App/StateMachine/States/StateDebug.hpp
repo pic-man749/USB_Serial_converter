@@ -32,12 +32,12 @@ namespace App {
       void CreateObject(const RenderContext &context);
 
       // obj ids
-      BinaryGFX::ObjectId oidBtnT_ = BinaryGFX::InvalidObjectId;
-      BinaryGFX::ObjectId oidBtnL_ = BinaryGFX::InvalidObjectId;
-      BinaryGFX::ObjectId oidBtnR_ = BinaryGFX::InvalidObjectId;
-      BinaryGFX::ObjectId oidBtnB_ = BinaryGFX::InvalidObjectId;
-      BinaryGFX::ObjectId oidBtnC_ = BinaryGFX::InvalidObjectId;
-      BinaryGFX::ObjectId oidEncStr_ = BinaryGFX::InvalidObjectId;
+      BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnT_;
+      BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnL_;
+      BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnR_;
+      BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnB_;
+      BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnC_;
+      BinaryGFX::TypedObjectId<BinaryGFX::StringObject> oidEncStr_;
 
       bool isPressedBtnT_ = false;
       bool isPressedBtnL_ = false;

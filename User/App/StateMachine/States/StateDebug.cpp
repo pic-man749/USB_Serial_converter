@@ -78,19 +78,19 @@ namespace App {
     }
 
     // ボタン状態更新
-    auto cirObj = context.LeftOled->getObjectById<BinaryGFX::CircleObject>(oidBtnT_);
+    auto cirObj = context.LeftOled->getObjectById(oidBtnT_);
     cirObj->setFilled(isPressedBtnT_);
-    cirObj = context.LeftOled->getObjectById<BinaryGFX::CircleObject>(oidBtnL_);
+    cirObj = context.LeftOled->getObjectById(oidBtnL_);
     cirObj->setFilled(isPressedBtnL_);
-    cirObj = context.LeftOled->getObjectById<BinaryGFX::CircleObject>(oidBtnR_);
+    cirObj = context.LeftOled->getObjectById(oidBtnR_);
     cirObj->setFilled(isPressedBtnR_);
-    cirObj = context.LeftOled->getObjectById<BinaryGFX::CircleObject>(oidBtnB_);
+    cirObj = context.LeftOled->getObjectById(oidBtnB_);
     cirObj->setFilled(isPressedBtnB_);
-    cirObj = context.LeftOled->getObjectById<BinaryGFX::CircleObject>(oidBtnC_);
+    cirObj = context.LeftOled->getObjectById(oidBtnC_);
     cirObj->setFilled(isPressedBtnC_);
 
     // エンコーダ積分値更新
-    auto strObj = context.LeftOled->getObjectById<BinaryGFX::StringObject>(oidEncStr_);
+    auto strObj = context.LeftOled->getObjectById(oidEncStr_);
     static const size_t kBufSize = 16;
     char textbuf[kBufSize] = {0};
     snprintf(textbuf, kBufSize, "%ld", encDeltaSum_);
@@ -103,7 +103,7 @@ namespace App {
   void StateDebug::CreateObject(const RenderContext &context) {
 
     // string object creator
-    auto CreateStrObj = [](BinaryGFX::BinaryGFX &oled, int16_t x, int16_t y, const char *text) -> BinaryGFX::ObjectId{
+    auto CreateStrObj = [](BinaryGFX::BinaryGFX &oled, int16_t x, int16_t y, const char *text) -> BinaryGFX::TypedObjectId<BinaryGFX::StringObject>{
       std::string str(text);
       auto obj = std::make_unique<BinaryGFX::StringObject>(x, y, str, &BinaryGFX::BgfxFont_Ascii);
       return oled.addObject(std::move(obj));
