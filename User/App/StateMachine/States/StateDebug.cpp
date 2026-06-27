@@ -63,6 +63,13 @@ namespace App {
     }, event);
   }
 
+  ExecuteResult StateDebug::Update(const UpdateContext &context){
+    auto now = context.tickMs;
+    span_ = now - lastTick_;
+    lastTick_ = now;
+    return ExecuteResult::executed(true);
+  }
+
   void StateDebug::Render(const RenderContext &context) {
 
     if(!isObjectCreated_){
@@ -94,6 +101,14 @@ namespace App {
     snprintf(textbuf, kBufSize, "%ld", encDeltaSum_);
     strObj->getText().assign(textbuf);
 
+    // FPS更新
+    if(span_ != 0){
+      auto fpsStrObj = context.LeftOled->getObjectById(oidFps_);
+      snprintf(textbuf, kBufSize, "FPS:%lu", 1000 / span_);
+      fpsStrObj->getText().assign(textbuf);
+    }
+
+
     context.LeftOled->update();
 
   }
@@ -118,7 +133,11 @@ namespace App {
     // navi
     BinaryGFX::createString(*context.RightOled, 0, 56, "[<<]Back");
 
-    // LeftOled : show button & encoder state
+    // LeftOled : FPS & show button & encoder state
+    // show FPS
+    snprintf(textbuf, kBufSize,  "FPS:%lu", 1000 / span_);
+    oidFps_ = BinaryGFX::createString(*context.LeftOled, 10, 8, "");
+
     // button
     static const uint16_t radius = 5;
     oidBtnC_ = BinaryGFX::createCircle(*context.LeftOled, 80, 32, radius);
