@@ -22,6 +22,7 @@ namespace App {
       void Enter() override;
       void Exit() override;
       ExecuteResult HandleEvent(const Event &event) override;
+      ExecuteResult Update(const UpdateContext &context) override;
       void Render(const RenderContext &context) override;
 
     private:
@@ -32,6 +33,7 @@ namespace App {
       void CreateObject(const RenderContext &context);
 
       // obj ids
+      BinaryGFX::TypedObjectId<BinaryGFX::StringObject> oidFps_;
       BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnT_;
       BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnL_;
       BinaryGFX::TypedObjectId<BinaryGFX::CircleObject> oidBtnR_;
@@ -47,6 +49,12 @@ namespace App {
 
       // encoder変化量の合計
       int32_t encDeltaSum_ = 0;
+
+      // 前回のTick値
+      uint32_t lastTick_ = 0;
+      // 前回～今回までの経過Tick値
+      uint32_t span_ = 0;
+
   };
 
 } // namespace App

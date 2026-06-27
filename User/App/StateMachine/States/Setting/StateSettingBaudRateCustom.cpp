@@ -5,7 +5,6 @@
  */
 #include "StateSettingBaudRateCustom.hpp"
 #include <variant>
-#include <memory>
 #include <algorithm>
 #include <cstdio>
 #include "Common/OverloadHelper.hpp"
@@ -112,12 +111,8 @@ namespace App {
 
   void StateSettingBaudRateCustom::drawScreen(BinaryGFX::BinaryGFX &oled) const {
     oled.removeAll();
-    auto addText = [&oled](int16_t x, int16_t y, const char *text) {
-      auto obj = std::make_unique<BinaryGFX::TextObject>(x, y, text, &BinaryGFX::BgfxFont_Ascii);
-      obj->setCharSpacing(1U);
-      oled.addObject(std::move(obj));
-    };
-    addText(0, 0, "BAUD CUSTOM");
+
+    BinaryGFX::createText(oled, 0, 0, "BAUD CUSTOM");
     // 桁列を構築する（形式: "D D D D D D D D"）
     char digitStr[kMaxDigits * 2U];
     size_t pos = 0U;
@@ -128,25 +123,25 @@ namespace App {
       digitStr[pos++] = static_cast<char>('0' + digits_[i]);
     }
     digitStr[pos] = '\0';
-    addText(0, 16, digitStr);
+    BinaryGFX::createText(oled, 0, 16, digitStr);
     // カーソル行（選択中の桁の直下に '^' を表示する）
     char cursorStr[kMaxDigits * 2U];
     for(uint8_t i = 0U; i < kMaxDigits * 2U - 1U; ++i) {
       cursorStr[i] = (i == cursorDigit_ * 2U) ? '^' : ' ';
     }
     cursorStr[kMaxDigits * 2U - 1U] = '\0';
-    addText(0, 24, cursorStr);
+    BinaryGFX::createText(oled, 0, 24, cursorStr);
     // 有効範囲の表示
-    addText(0, 32, "2565-10500000");
+    BinaryGFX::createText(oled, 0, 32, "2565-10500000");
     // エラーメッセージ
     if(valueError_) {
-      addText(0, 40, "OUT OF RANGE");
+      BinaryGFX::createText(oled, 0, 40, "OUT OF RANGE");
     }
     // 失敗
     if(isSettingFailed_){
-      addText(0, 40, "INVALID VALUE");
+      BinaryGFX::createText(oled, 0, 40, "INVALID VALUE");
     }
-    addText(0, 56, "[<]Back [o]OK");
+    BinaryGFX::createText(oled, 0, 56, "[<]Back [o]OK");
     oled.update();
   }
 

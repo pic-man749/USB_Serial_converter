@@ -4,7 +4,6 @@
  *      Author: picman
  */
 #include "StateSetting.hpp"
-#include <memory>
 #include <cstdio>
 #include "BinaryGFX.hpp"
 
@@ -49,39 +48,35 @@ namespace App {
   // ---------------------------------------------------------------------------
   void StateSetting::drawMenu(BinaryGFX::BinaryGFX &oled) const {
     oled.removeAll();
-    auto addText = [&oled](int16_t x, int16_t y, const char *text) {
-      auto obj = std::make_unique<BinaryGFX::TextObject>(x, y, text, &BinaryGFX::BgfxFont_Ascii);
-      obj->setCharSpacing(1U);
-      oled.addObject(std::move(obj));
-    };
-    addText(0, 0, "SETTINGS");
+
+    BinaryGFX::createText(oled, 0, 0, "SETTINGS");
 
     // UART 項目
     const char *uartStr = App::GetUartChannelStr(config_.selectedUart);
     char line0[22];
     snprintf(line0, sizeof(line0), "%c UART : %s", (cursorIndex_ == 0U) ? '>' : ' ', uartStr);
-    addText(0, 8, line0);
+    BinaryGFX::createText(oled, 0, 8, line0);
 
     // BaudRate 項目
     char baudStr[9];
     snprintf(baudStr, sizeof(baudStr), "%u", static_cast<unsigned int>(config_.baudRate));
     char line1[22];
     snprintf(line1, sizeof(line1), "%c BAUD : %s", (cursorIndex_ == 1U) ? '>' : ' ', baudStr);
-    addText(0, 16, line1);
+    BinaryGFX::createText(oled, 0, 16, line1);
 
     // Format 項目
     const char *modeStr = (config_.displayMode == DisplayMode::Hex) ? "HEX" : "ASCII";
     char line2[22];
     snprintf(line2, sizeof(line2), "%c MODE : %s", (cursorIndex_ == 2U) ? '>' : ' ', modeStr);
-    addText(0, 24, line2);
+    BinaryGFX::createText(oled, 0, 24, line2);
 
     // Debug 項目
     char line3[22];
     snprintf(line3, sizeof(line3), "%c Debug", (cursorIndex_ == 3U) ? '>' : ' ');
-    addText(0, 32, line3);
+    BinaryGFX::createText(oled, 0, 32, line3);
 
     // フッタ行
-    addText(0, 56, "[<]Back [o]Enter");
+    BinaryGFX::createText(oled, 0, 56, "[<]Back [o]Enter");
     oled.update();
   }
 
