@@ -4,7 +4,6 @@
  *      Author: picman
  */
 #include "StateSettingFormat.hpp"
-#include <memory>
 #include <cstdio>
 #include "BinaryGFX.hpp"
 
@@ -39,19 +38,15 @@ namespace App {
   // ---------------------------------------------------------------------------
   void StateSettingFormat::drawScreen(BinaryGFX::BinaryGFX &oled) const {
     oled.removeAll();
-    auto addText = [&oled](int16_t x, int16_t y, const char *text) {
-      auto obj = std::make_unique<BinaryGFX::TextObject>(x, y, text, &BinaryGFX::BgfxFont_Ascii);
-      obj->setCharSpacing(1U);
-      oled.addObject(std::move(obj));
-    };
-    addText(0, 0, "DISP FORMAT");
+
+    BinaryGFX::createText(oled, 0, 0, "DISP FORMAT");
     const char *labels[kItemCount] = { "HEX", "ASCII" };
     char lines[kItemCount][22];
     for(uint8_t i = 0U; i < kItemCount; ++i) {
       snprintf(lines[i], sizeof(lines[i]), "%c %s", (cursorIndex_ == i) ? '>' : ' ', labels[i]);
-      addText(0, static_cast<int16_t>(16 + i * 8), lines[i]);
+      BinaryGFX::createText(oled, 0, static_cast<int16_t>(16 + i * 8), lines[i]);
     }
-    addText(0, 56, "[<]Back [o]OK");
+    BinaryGFX::createText(oled, 0, 56, "[<]Back [o]OK");
     oled.update();
   }
 

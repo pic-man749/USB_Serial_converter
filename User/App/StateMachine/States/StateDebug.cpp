@@ -5,8 +5,6 @@
  */
 #include "StateDebug.hpp"
 #include "Common/OverloadHelper.hpp"
-#include <memory>
-#include <string>
 #include <cstdint>
 
 namespace App {
@@ -102,43 +100,37 @@ namespace App {
 
   void StateDebug::CreateObject(const RenderContext &context) {
 
-    // string object creator
-    auto CreateStrObj = [](BinaryGFX::BinaryGFX &oled, int16_t x, int16_t y, const char *text) -> BinaryGFX::TypedObjectId<BinaryGFX::StringObject>{
-      std::string str(text);
-      auto obj = std::make_unique<BinaryGFX::StringObject>(x, y, str, &BinaryGFX::BgfxFont_Ascii);
-      return oled.addObject(std::move(obj));
-    };
     static const size_t kBufSize = 32;
     char textbuf[kBufSize] = {0};
 
     // RightOled : show settings
-    CreateStrObj(*context.RightOled, 0, 0, "SETTINGS");
+    BinaryGFX::createString(*context.RightOled, 0, 0, "SETTINGS");
     // baudrate
     snprintf(textbuf, kBufSize, "baudrate:%lu", config_.baudRate);
-    CreateStrObj(*context.RightOled, 5, 16, textbuf);
+    BinaryGFX::createString(*context.RightOled, 5, 16, textbuf);
     // display mode
     snprintf(textbuf, kBufSize,  "display mode:%s", GetDisplayModeStr(config_.displayMode));
-    CreateStrObj(*context.RightOled, 5, 24, textbuf);
+    BinaryGFX::createString(*context.RightOled, 5, 24, textbuf);
     // uart
     snprintf(textbuf, kBufSize,  "uart:%s", GetUartChannelStr(config_.selectedUart));
-    CreateStrObj(*context.RightOled, 5, 32, textbuf);
+    BinaryGFX::createString(*context.RightOled, 5, 32, textbuf);
 
     // navi
-    CreateStrObj(*context.RightOled, 0, 56, "[<<]Back");
+    BinaryGFX::createString(*context.RightOled, 0, 56, "[<<]Back");
 
     // LeftOled : show button & encoder state
     // button
     static const uint16_t radius = 5;
-    oidBtnC_ = context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(80, 32, radius));
-    oidBtnL_ = context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(80-radius*3, 32, radius));
-    oidBtnR_ = context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(80+radius*3, 32, radius));
-    oidBtnT_ = context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(80, 32-radius*3, radius));
-    oidBtnB_ = context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(80, 32+radius*3, radius));
+    oidBtnC_ = BinaryGFX::createCircle(*context.LeftOled, 80, 32, radius);
+    oidBtnL_ = BinaryGFX::createCircle(*context.LeftOled, 80-radius*3, 32, radius);
+    oidBtnR_ = BinaryGFX::createCircle(*context.LeftOled, 80+radius*3, 32, radius);
+    oidBtnT_ = BinaryGFX::createCircle(*context.LeftOled, 80, 32-radius*3, radius);
+    oidBtnB_ = BinaryGFX::createCircle(*context.LeftOled, 80, 32+radius*3, radius);
 
     // encoder
-    context.LeftOled->addObject(std::make_unique<BinaryGFX::CircleObject>(40, 32, radius*2));
+    BinaryGFX::createCircle(*context.LeftOled, 40, 32, radius*2);
     snprintf(textbuf, kBufSize, "%ld", encDeltaSum_);
-    oidEncStr_ = CreateStrObj(*context.LeftOled, 30, 50, textbuf);
+    oidEncStr_ = BinaryGFX::createString(*context.LeftOled, 30, 50, textbuf);
 
   }
 

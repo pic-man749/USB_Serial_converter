@@ -5,7 +5,6 @@
  */
 #include "StateMonitorCommunication.hpp"
 #include <variant>
-#include <memory>
 #include <algorithm>
 #include "Common/OverloadHelper.hpp"
 #include "BinaryGFX.hpp"
@@ -69,14 +68,7 @@ namespace App {
                                              const char *header) {
     oled.removeAll();
 
-    // TextObject 生成ヘルパー（charSpacing=1 で 6px ピッチ）
-    auto addText = [&oled](int16_t x, int16_t y, const char *text) {
-      auto obj = std::make_unique<BinaryGFX::TextObject>(x, y, text, &BinaryGFX::BgfxFont_Ascii);
-      obj->setCharSpacing(1U);
-      oled.addObject(std::move(obj));
-    };
-
-    addText(0, 0, header);
+    BinaryGFX::createText(oled, 0, 0, header);
     // oled.addObject(std::make_unique<BinaryGFX::LineObject>(0, 7, 127, 7));
 
     const size_t bufSize = buf.size();
@@ -106,7 +98,7 @@ namespace App {
             buildAsciiLine(lines[row], buf, byteIndex);
           }
         }
-        addText(0, static_cast<int16_t>((1U + row) * kFontHeight), lines[row]);
+        BinaryGFX::createText(oled, 0, static_cast<int16_t>((1U + row) * kFontHeight), lines[row]);
       }
     }
     oled.update();
