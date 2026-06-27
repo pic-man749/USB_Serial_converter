@@ -53,7 +53,7 @@ namespace App {
 
       virtual void Enter() = 0;
       virtual void Exit() = 0;
-      virtual ExecuteResult Update(const UpdateContext&) {
+      virtual ExecuteResult Update(const UpdateContext &context) {
         return ExecuteResult::None();
       }
       virtual ExecuteResult HandleEvent(const Event &event) = 0;
