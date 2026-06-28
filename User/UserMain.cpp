@@ -110,16 +110,10 @@ void setup(void) {
   // 3. OLED ディスプレイを初期化する
   //    左 OLED: I2C2 / 右 OLED: I2C1
   {
-    auto leftHal = std::make_unique<BinaryGFX::Hal::Stm32I2cDma>(&hi2c2, kI2cTimeout);
-    auto leftDriver = std::make_unique<BinaryGFX::Driver::Ssd1306Driver>(std::move(leftHal),
-        kOledAddr, kOledWidth, kOledHeight);
-    g_leftOled = std::make_unique<BinaryGFX::BinaryGFX>(std::move(leftDriver));
+    g_leftOled = BinaryGFX::createGfxStm32I2cDma(&hi2c2, kI2cTimeout, kOledAddr, kOledWidth, kOledHeight);
     g_leftOled->init();
 
-    auto rightHal = std::make_unique<BinaryGFX::Hal::Stm32I2cDma>(&hi2c1, kI2cTimeout);
-    auto rightDriver = std::make_unique<BinaryGFX::Driver::Ssd1306Driver>(std::move(rightHal),
-        kOledAddr, kOledWidth, kOledHeight);
-    g_rightOled = std::make_unique<BinaryGFX::BinaryGFX>(std::move(rightDriver));
+    g_rightOled = BinaryGFX::createGfxStm32I2cDma(&hi2c1, kI2cTimeout, kOledAddr, kOledWidth, kOledHeight);
     g_rightOled->init();
   }
 
